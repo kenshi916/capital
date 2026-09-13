@@ -1,7 +1,9 @@
 import { getAddress } from 'ethers';
 
+export const FUNDING_POLICY = Object.freeze({ source: 'Pons creator fees', holderDeposits: false, collectionVerified: false, note: 'Only creator fees allocated to Capital fund the investment plan. Record actual receipts and any conversion before treating funds as available.' });
+
 export const SECTIONS = [
-  { id: 'token', title: 'Token & fees', intro: 'Identify the launch and the route from creator fees to investment cash.', fields: [
+  { id: 'token', title: 'Token & fees', intro: 'Capital’s investment funding comes from Pons creator fees. Identify the launch, fee recipient and settlement route.', fields: [
     ['networkName', 'Launch network', 'text', 'Network name'],
     ['chainId', 'Chain ID', 'chain', 'Confirm with the network'],
     ['tokenAddress', 'Launch token address', 'address', '0x…'],
@@ -9,7 +11,8 @@ export const SECTIONS = [
     ['feeWallet', 'Creator payout wallet', 'address', '0x…'],
     ['creatorShare', 'Creator fee share · %', 'percent', 'Use this launch’s actual split'],
     ['feeAssets', 'Assets received as fees', 'text', 'Token symbols and contract addresses'],
-    ['conversion', 'Conversion & bank settlement route', 'textarea', 'Who collects fees, converts assets and reconciles the cash?']
+    ['conversion', 'Conversion & provider settlement route', 'textarea', 'Who collects fees and settles the asset and network accepted by the offering? Include any conversion and transfer costs.'],
+    ['feeReference', 'Creator-fee receipt references', 'textarea', 'Launch token, chain, asset, amount, withdrawal transaction and matching treasury receipt. Record conversions separately.']
   ]},
   { id: 'entity', title: 'Entity & rights', intro: 'Record the proposed buyer and the structure your reviewers need to approve.', fields: [
     ['entity', 'Investing entity', 'text', 'Full legal name'],
@@ -44,7 +47,7 @@ export const SECTIONS = [
   ]}
 ];
 export const FIELDS = SECTIONS.flatMap(s => s.fields);
-export const EVIDENCE_TYPES = ['Structure review', 'Provider account approval', 'Signed subscription agreement', 'Payment confirmation', 'Final holding statement', 'Contract security review', 'Integration acceptance'];
+export const EVIDENCE_TYPES = ['Creator-fee withdrawal', 'Settlement confirmation', 'Treasury receipt', 'Structure review', 'Provider account approval', 'Signed subscription agreement', 'Payment confirmation', 'Final holding statement', 'Contract security review', 'Integration acceptance'];
 export const PRODUCTION_BLOCKERS = [
   'Confirm the launch token, Pons fee recipient and collection / conversion integration.',
   'Obtain review of the investing structure, holder rights and participant eligibility.',
@@ -83,7 +86,7 @@ export function assess(plan) {
   return { sections, filled: sections.reduce((n,s) => n+s.filled,0), total: FIELDS.length, invalid, budget, liveEnabled: false };
 }
 export function packet(plan) {
-  return { schema: 'mainstreet-launch-plan', version: 1, exportedAt: new Date().toISOString(), status: 'DRAFT — OPERATOR REPORTED, NOT VERIFIED', liveEnabled: false, fields: { ...plan.fields }, evidence: plan.evidence.map(e => ({...e})), productionBlockers: [...PRODUCTION_BLOCKERS], notice: 'Preparation only. No order, transfer, approval or ownership verification is performed. Document hashes identify bytes; they do not establish authenticity or ownership.' };
+  return { schema: 'mainstreet-launch-plan', version: 1, exportedAt: new Date().toISOString(), status: 'DRAFT — OPERATOR REPORTED, NOT VERIFIED', liveEnabled: false, funding: { ...FUNDING_POLICY }, fields: { ...plan.fields }, evidence: plan.evidence.map(e => ({...e})), productionBlockers: [...PRODUCTION_BLOCKERS], notice: 'Preparation only. No order, transfer, approval or ownership verification is performed. Document hashes identify bytes; they do not establish authenticity or ownership.' };
 }
 export function importPlan(input) {
   if (!input || input.schema !== 'mainstreet-launch-plan' || input.version !== 1 || !input.fields || typeof input.fields !== 'object' || Array.isArray(input.fields)) throw new Error('Choose a Capital launch plan JSON file (version 1).');
@@ -105,5 +108,5 @@ export function importPlan(input) {
 }
 export function reviewText(plan) {
   const result = assess(plan);
-  return ['# Capital launch review packet', '', 'DRAFT — operator reported; not independently verified. Real-money actions are disabled.', '', `Prepared: ${new Date().toISOString()}`, '', ...SECTIONS.flatMap(s => [`## ${s.title}`, '', ...s.fields.flatMap(([key,label]) => [`${label}: ${plan.fields[key] || 'NOT PROVIDED'}`, ''])]), '## Purchase budget', '', ...(result.budget ? [`Purchase including fees: ${usd(result.budget.purchase)}`, `Required including reserve: ${usd(result.budget.required)}`, `Reported settled cash: ${usd(result.budget.cash)}`, `Funding gap: ${usd(result.budget.gap > 0n ? result.budget.gap : 0n)}`] : ['Incomplete — supply investment, fees, reserve and settled cash.']), '', '## Document references', '', ...plan.evidence.map(e => `${e.type}: ${e.name}\nSHA-256: ${e.sha256}\nSize: ${e.size} bytes; added: ${e.addedAt}`), ...(plan.evidence.length ? [] : ['No documents referenced.']), '', 'Hashes identify file contents only. Original files are not included, uploaded, or verified.', '', '## Required before activation', '', ...PRODUCTION_BLOCKERS.map(s => `- ${s}`), '', 'Completing this draft does not activate production, prove ownership, or authorize any investment or payout.', ''].join('\n');
+  return ['# Capital launch review packet', '', 'DRAFT — operator reported; not independently verified. Real-money actions are disabled.', '', `Prepared: ${new Date().toISOString()}`, '', '## Investment funding', '', `Source: ${FUNDING_POLICY.source}`, 'Holder deposits: not part of this funding model.', FUNDING_POLICY.note, 'Collection and settlement are not verified by this draft.', '', ...SECTIONS.flatMap(s => [`## ${s.title}`, '', ...s.fields.flatMap(([key,label]) => [`${label}: ${plan.fields[key] || 'NOT PROVIDED'}`, ''])]), '## Purchase budget', '', ...(result.budget ? [`Purchase including fees: ${usd(result.budget.purchase)}`, `Required including reserve: ${usd(result.budget.required)}`, `Reported settled cash: ${usd(result.budget.cash)}`, `Funding gap: ${usd(result.budget.gap > 0n ? result.budget.gap : 0n)}`] : ['Incomplete — supply investment, fees, reserve and settled cash.']), '', '## Document references', '', ...plan.evidence.map(e => `${e.type}: ${e.name}\nSHA-256: ${e.sha256}\nSize: ${e.size} bytes; added: ${e.addedAt}`), ...(plan.evidence.length ? [] : ['No documents referenced.']), '', 'Hashes identify file contents only. Original files are not included, uploaded, or verified.', '', '## Required before activation', '', ...PRODUCTION_BLOCKERS.map(s => `- ${s}`), '', 'Completing this draft does not activate production, prove ownership, or authorize any investment or payout.', ''].join('\n');
 }

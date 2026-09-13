@@ -240,3 +240,6 @@ html[data-theme=dark] .builders-heading h2 span{color:#d4fc50}
 html[data-theme=dark] .capital-mark{filter:invert(1)}
 @media(max-width:800px){.site-header .wordmark{gap:8px;font-size:1.375rem}.site-header .capital-mark{width:28px;height:28px;flex-basis:28px}}
 @media(max-width:370px){.site-header .wordmark{font-size:1.25rem;gap:7px}.site-header .capital-mark{width:25px;height:25px;flex-basis:25px}}
+
+.home-eyebrow.home-builder-label{font-size:.875rem;line-height:1.4;max-width:100%}
+.home-eyebrow.home-builder-label:before{display:none}
