@@ -1,0 +1,20 @@
+[
+  {
+    "company": "mercury",
+    "source": "https://mercury.com/",
+    "image_source": "https://mercury.com/apple-icon.png?e5cbb3efa4b20928",
+    "file": "mercury-logo.png"
+  },
+  {
+    "company": "gumroad",
+    "source": "https://gumroad.com/",
+    "image_source": "https://assets.gumroad.com/images/pink-icon.png",
+    "file": "gumroad-logo.png"
+  },
+  {
+    "company": "nothing",
+    "source": "https://nothing.tech/",
+    "image_source": "https://cdn.shopify.com/oxygen-v2/43495/38485/80939/4436627/assets/favicon-red_128px-Bkp3sDzU.png",
+    "file": "nothing-logo.png"
+  }
+]

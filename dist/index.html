@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f0f4f9">
+  <meta name="description" content="Explore Mainstreet, a concept for a community-owned portfolio of real businesses. All allocations and holdings shown are illustrative.">
+  <title>Mainstreet — Real businesses. Shared possibilities.</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23162035'/%3E%3Cpath d='M10 28V16h5v12m3 0V10h5v18m3 0V19h5v9' fill='none' stroke='%23e7f19a' stroke-width='3.5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="wordmark" href="#explore" aria-label="Mainstreet home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>mainstreet<span class="brand-period">.</span></a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#explore" class="nav-item active" data-view="explore">Explore</a>
+        <a href="#treasury" class="nav-item" data-view="treasury">Treasury</a>
+        <a href="#holdings" class="nav-item" data-view="holdings">My holdings</a>
+      </nav>
+      <div class="header-actions"><span class="network-pill"><span class="network-symbol" aria-hidden="true">↗</span><span>Robinhood Chain</span><span class="concept-tag">Concept</span></span><button class="button button-dark wallet-button" id="wallet-button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 8V6a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h15v10H5a3 3 0 0 1-3-3V7m18 6h-5v4h5m-4-2h.01"/></svg><span>Preview wallet</span></button></div>
+    </div>
+  </header>
+  <main id="main" class="main-shell">
+    <div class="demo-notice"><span class="demo-label">INTERACTIVE DEMO</span><p>Real companies. Illustrative holdings. No investments or tokens have been issued.</p><button class="text-button" id="about-button">How it works <span aria-hidden="true">↗</span></button></div>
+    <section id="view-explore" class="view" aria-label="Explore companies">
+      <div class="intro-grid">
+        <div class="intro-copy"><p class="eyebrow"><span></span> A WORLD OF OWNERSHIP</p><h1>Real businesses.<br><span>Shared possibilities.</span></h1><p class="intro-description">Explore a new way to build a community portfolio,<br class="desktop-break"> one business at a time.</p></div>
+        <div class="portfolio-summary glass">
+          <div class="summary-top"><span class="small-label">THE DEMO PORTFOLIO</span><span class="subtle-pill">Illustrative</span></div>
+          <div class="summary-value">$250,000<span>acquisition cost</span></div>
+          <div class="allocation-strip" id="summary-strip" aria-label="Demo company allocation"></div>
+          <div class="summary-bottom"><span><strong>6</strong> real companies</span><a href="#treasury">Explore the treasury <span aria-hidden="true">↗</span></a></div>
+        </div>
+      </div>
+      <section class="company-section" aria-labelledby="companies-heading">
+        <div class="section-heading"><div><h2 id="companies-heading">Discover the portfolio <span class="count-badge" id="company-count">6</span></h2><p>Businesses you know. A perspective you can own.</p></div><div class="view-caption"><span class="stack-icon" aria-hidden="true">◫</span> Sample company positions</div></div>
+        <div class="catalog-toolbar">
+          <div class="filters" role="group" aria-label="Filter companies by sector"><button class="filter active" data-filter="All" aria-pressed="true">All companies</button><button class="filter" data-filter="Software" aria-pressed="false">Software</button><button class="filter" data-filter="Fintech" aria-pressed="false">Fintech</button><button class="filter" data-filter="Consumer" aria-pressed="false">Consumer</button><button class="filter" data-filter="Health" aria-pressed="false">Health</button></div>
+          <div class="catalog-controls"><label class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span class="sr-only">Search companies</span><input id="company-search" type="search" placeholder="Find a company…" autocomplete="off"></label><label class="sort-box"><span class="sr-only">Sort companies</span><select id="company-sort"><option value="allocation">Largest allocation</option><option value="name">Company A–Z</option></select></label></div>
+        </div>
+        <div class="company-grid" id="company-grid"></div>
+        <div id="empty-state" class="empty-state glass" hidden><span aria-hidden="true">⌕</span><h3>No companies found</h3><p>Try another name or choose a different sector.</p><button class="button button-dark" id="reset-filters">Clear filters</button></div>
+        <p class="catalog-footnote"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.01"/></svg>Company names identify the businesses shown. Allocations are fictional; investment availability and ownership are not verified. No affiliation is implied.</p>
+      </section>
+      <div class="bottom-note glass"><div class="note-icon" aria-hidden="true">↗</div><div><h3>A treasury with a paper trail.</h3><p>The concept: fees fund investments, and every holding has documented rights.</p></div><a class="button button-light" href="#treasury">Inside the treasury <span aria-hidden="true">↗</span></a></div>
+    </section>
+    <section id="view-treasury" class="view" aria-label="Demo treasury" hidden>
+      <div class="view-title"><div><p class="eyebrow"><span></span> THE BIG PICTURE</p><h1>Every dollar.<br><span>A clear destination.</span></h1><p class="intro-description">A transparent look at the illustrative portfolio and its cash.</p></div><span class="status-tag">Demo balances</span></div>
+      <div class="metrics-row"><article class="metric-card glass"><span>Total model assets</span><strong>$268,750</strong><p>Acquisition cost plus unallocated cash</p></article><article class="metric-card glass"><span>Allocated to companies</span><strong>$250,000</strong><p>Six illustrative company positions</p></article><article class="metric-card glass"><span>Unallocated treasury cash</span><strong>$18,750</strong><p>Available in this example only</p></article></div>
+      <div class="treasury-grid"><article class="allocation-panel glass"><div class="panel-heading"><h2>Portfolio composition</h2><span class="subtle-pill">At cost</span></div><div class="donut-area"><div class="allocation-donut"><div><span>Allocated</span><strong>$250k</strong><small>6 companies</small></div></div><ul class="allocation-legend" id="allocation-legend"></ul></div><p class="panel-note">Allocation describes the example portfolio. It is not a current market valuation.</p></article><article class="flow-panel glass"><div class="panel-heading"><h2>From fees to holdings</h2><span class="subtle-pill">Concept</span></div><ol class="funding-steps"><li><span class="step-number">01</span><div><h3>Trading fees reach the treasury</h3><p>Only fees actually received can fund purchases.</p></div></li><li><span class="step-number">02</span><div><h3>The company acquires a position</h3><p>Each investment has its own terms and eligibility requirements.</p></div></li><li><span class="step-number">03</span><div><h3>Ownership gets documented</h3><p>Holdings and the rights of eligible holders are recorded.</p></div></li></ol><div class="flow-bottom"><span>Sample fee receipts</span><strong>$268,750</strong></div></article></div>
+      <article class="positions-panel glass"><div class="panel-heading"><h2>Illustrative holdings</h2><span class="small-label">NO POSITIONS PURCHASED</span></div><div class="table-scroll"><table><thead><tr><th>Company</th><th>Sector</th><th>Sample cost</th><th>Allocation</th><th>Status</th><th><span class="sr-only">Details</span></th></tr></thead><tbody id="treasury-table"></tbody></table></div></article>
+    </section>
+    <section id="view-holdings" class="view" aria-label="Your demo holdings" hidden>
+      <div class="view-title"><div><p class="eyebrow"><span></span> YOUR PIECE OF THE PICTURE</p><h1>Your holdings.<br><span>Clearly connected.</span></h1><p class="intro-description">See how an illustrative portfolio interest could be displayed.</p></div><span class="status-tag">Simulated account</span></div>
+      <div id="wallet-empty" class="wallet-empty glass"><div class="wallet-illustration" aria-hidden="true">◫</div><h2>A closer look at your share.</h2><p>Open a demo account to explore a sample 0.5% interest.<br>No real wallet connection or signature is needed.</p><button class="button button-dark" id="holdings-preview-button">Use demo account <span aria-hidden="true">↗</span></button></div>
+      <div id="holdings-content" hidden><div class="metrics-row"><article class="metric-card glass"><span>Sample portfolio interest</span><strong>0.50<span class="percent-sign">%</span></strong><p>Illustrative only · no ownership issued</p></article><article class="metric-card glass"><span>Attributed acquisition cost</span><strong>$1,250</strong><p>0.5% of the sample $250,000 portfolio</p></article><article class="metric-card glass"><span>Attributed treasury cash</span><strong>$93.75</strong><p>A model allocation, not a withdrawable balance</p></article></div><article class="positions-panel glass"><div class="panel-heading"><h2>Your portfolio breakdown</h2><span class="subtle-pill">Demo account</span></div><div class="table-scroll"><table><thead><tr><th>Company</th><th>Sample attributable cost</th><th>Portfolio allocation</th><th><span class="sr-only">Details</span></th></tr></thead><tbody id="holdings-table"></tbody></table></div><p class="panel-note">These figures demonstrate a potential indirect portfolio interest. They do not represent direct ownership of the named companies, token market prices, or a redemption entitlement.</p></article></div>
+    </section>
+    <footer class="site-footer"><a class="wordmark footer-wordmark" href="#explore">mainstreet<span class="brand-period">.</span></a><span>A portfolio of possibility.</span><div><span>Prototype · 2026</span><button class="text-button" id="footer-about">About this demo <span aria-hidden="true">↗</span></button></div></footer>
+  </main>
+  <dialog id="holding-dialog" class="holding-dialog" aria-labelledby="holding-title"><div id="holding-detail"></div></dialog>
+  <dialog id="about-dialog" class="info-dialog" aria-labelledby="about-title"><button class="icon-button dialog-close" data-close aria-label="Close explanation">×</button><p class="eyebrow"><span></span> MAINSTREET, EXPLAINED</p><h2 id="about-title">Real assets.<br>Clear rights.</h2><p class="dialog-intro">A concept for a community-owned investment portfolio funded by actual trading fees.</p><div class="info-step"><span>01</span><div><h3>A company holds the investments</h3><p>Shares or other investment interests are acquired through an eligible platform and documented offchain.</p></div></div><div class="info-step"><span>02</span><div><h3>The token’s rights are defined</h3><p>Actual exposure requires enforceable rights in the investment company and an appropriate legal structure.</p></div></div><div class="info-step"><span>03</span><div><h3>The treasury stays inspectable</h3><p>Purchase costs, cash, liabilities, and valuation dates should be visible. Returns and liquidity are not guaranteed.</p></div></div><div class="dialog-disclaimer">This is an interface prototype. All positions, allocations, and account balances are fictional. There is no active offering, token, wallet integration, company affiliation, or confirmed Pons / Robinhood Chain integration.</div><button class="button button-dark full-width" data-close>Explore the demo</button></dialog>
+  <dialog id="wallet-dialog" class="info-dialog wallet-dialog" aria-labelledby="wallet-title"><button class="icon-button dialog-close" data-close aria-label="Close demo account">×</button><div class="wallet-dialog-icon" aria-hidden="true">◫</div><p class="eyebrow">PREVIEW MODE</p><h2 id="wallet-title">Your first look<br>at ownership.</h2><p class="dialog-intro">Explore an example account with a 0.5% portfolio interest. No wallet access, funds, or signatures are requested.</p><div class="demo-account-row"><div class="demo-avatar" aria-hidden="true">M</div><div><strong>Mainstreet demo account</strong><span>Illustrative holdings only</span></div><span aria-hidden="true">↗</span></div><button class="button button-dark full-width" id="use-demo-account">Use demo account <span aria-hidden="true">↗</span></button><button class="text-button full-width disconnect-button" id="disconnect-demo" hidden>End demo session</button></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
