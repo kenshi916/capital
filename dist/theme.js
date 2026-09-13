@@ -9,7 +9,7 @@
 
   function apply(theme) {
     root.dataset.theme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#101416' : '#f7f8f9');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#000000' : '#f7f8f9');
     const toggle = document.getElementById('theme-toggle');
     if (toggle) {
       const label = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';

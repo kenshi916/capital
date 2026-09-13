@@ -231,6 +231,7 @@ async function deploy() {
 
 function clearBalances() {
   state.owner = false;
+  $('.capital-allocation-bar > span').style.width = '0%';
   for (const id of ['total-assets','fee-receipts','capital-allocated','available-cash','activity-cash','chain-cash-available','chain-cash-orders','chain-cash-reserve','chain-income-available','chain-distributed','holder-assets','holder-cost','chain-holder-claimable','chain-holder-received','chain-holder-gas']) text('#' + id, '—');
   text('#chain-updated', 'Balances not loaded'); text('#chain-holder-interest', 'Participation not loaded');
   $('#treasury-table').innerHTML = '<tr><td colspan="4" class="chain-empty-cell">Load a test treasury to read its records.</td></tr>';
@@ -310,13 +311,16 @@ function renderBalances() {
 }
 const investmentStatus = value => ['Reserved test purchase','Test purchase recorded','Cancelled','Test principal repaid'][Number(value)];
 function renderInvestments() {
+  const normalizedSource = value => { try { const url = new URL(value); return url.origin.toLowerCase() + url.pathname.replace(/\/+$/, ''); } catch { return ''; } };
   const d = state.data; text('#chain-investment-count', String(d.investments.length));
   const rows = (holder = false) => d.investments.filter(inv => !holder || ((d.units || 0n) > 0n && [1,3].includes(Number(inv.value.status)))).map(({ id, value: inv }) => {
     const cost = holder ? (d.totalUnits > 0n ? (inv.cost - inv.principalRepaid) * (d.units || 0n) / d.totalUnits : 0n) : inv.cost - inv.principalRepaid;
-    return `<tr><td><button class="table-company" data-chain-investment="${id}"><span class="company-logo"><span>${esc(inv.name.slice(0,1))}</span></span><span><strong>${esc(inv.name)}</strong><small>${esc(inv.security)}</small></span></button></td><td class="table-value">${dollars(cost)}</td><td><span class="chain-record-status">${investmentStatus(inv.status)}</span></td><td><button class="row-button" data-chain-investment="${id}" aria-label="Open ${esc(inv.name)} test record">↗</button></td></tr>`;
+    const source = normalizedSource(inv.source);
+    const company = source && window.MainstreetDirectory?.opportunities.find(c => normalizedSource(c.source) === source);
+    const logo = company ? `<img src="${esc(company.image)}" alt="" width="38" height="38" style="object-fit:${company.imageFit || 'cover'}">` : `<span>${esc(inv.name.slice(0,1))}</span>`;
+    return `<tr><td><button class="table-company" data-chain-investment="${id}"><span class="company-logo">${logo}</span><span><strong>${esc(inv.name)}</strong><small>${esc(inv.security)}</small></span></button></td><td class="table-value">${dollars(cost)}</td><td><span class="chain-record-status">${investmentStatus(inv.status)}</span></td><td><button class="row-button" data-chain-investment="${id}" aria-label="Open ${esc(inv.name)} test record">↗</button></td></tr>`;
   }).join('');
   $('#treasury-table').innerHTML = rows() || '<tr><td colspan="4" class="chain-empty-cell">No investment records yet. The administrator can reserve the first test purchase.</td></tr>';
-  const normalizedSource = value => { try { const url = new URL(value); return url.origin.toLowerCase() + url.pathname.replace(/\/+$/, ''); } catch { return ''; } };
   $('#holdings-table').innerHTML = d.investments.filter(({value:inv}) => (d.units || 0n) > 0n && [1,3].includes(Number(inv.status))).map(({id,value:inv}) => {
     const source = normalizedSource(inv.source);
     const c = source && window.MainstreetDirectory?.opportunities.find(c => normalizedSource(c.source) === source);
