@@ -50,8 +50,9 @@ test('published UI completes wallet deployment, fee deposit, purchase, payment, 
       request: async args => {
         if (args.method === 'eth_sendTransaction') sentTransactions++;
         if (args.method === 'eth_getLogs' && switchOnLogs) {
+          w.document.querySelector('#chain-ledger-status').textContent = 'Waiting for switched wallet history';
           switchOnLogs = false; activeAccount = accounts[0]; listeners.get('accountsChanged')([activeAccount]);
-          await waitFor(()=>w.document.querySelector('#chain-treasury-address').textContent.includes('Administrator'), 'Changed wallet refresh did not finish');
+          await waitFor(()=>w.document.querySelector('#chain-treasury-address').textContent.includes('Administrator') && w.document.querySelector('#chain-ledger-status').textContent.startsWith('Showing events'), 'Changed wallet history refresh did not finish');
         }
         return ['eth_requestAccounts','eth_accounts'].includes(args.method) ? [activeAccount] : engine.request(args);
       },
@@ -106,6 +107,11 @@ test('published UI completes wallet deployment, fee deposit, purchase, payment, 
     submit('#chain-distribution-form');
     await waitFor(() => w.document.querySelector('#chain-holder-claimable').textContent === '600.00', 'Distribution did not freeze the 60/40 allocation: '+w.document.querySelector('#toast').textContent);
     await ready(); w.document.querySelector('#chain-admin-dialog').close(); w.location.hash = '#holdings';
+    const holding = w.document.querySelector('#holdings-table .investment-strip');
+    assert(holding, 'Holder should see a horizontal investment card');
+    assert.equal(holding.querySelector('.company-portrait').getAttribute('src'), '/assets/miso-robotics.webp');
+    assert.match(holding.textContent, /1,020.00/);
+    assert.match(holding.textContent, /No real shares issued/);
     w.document.querySelector('[data-chain-claim="0"]').click();
     await waitFor(() => w.document.querySelector('#chain-holder-received').textContent === '600.00', 'First claim did not arrive'); await ready();
     assert.equal(w.document.querySelector('#chain-holder-claimable').textContent,'0.00');
@@ -120,6 +126,7 @@ test('published UI completes wallet deployment, fee deposit, purchase, payment, 
     switchOnLogs = true;
     w.document.querySelector('#chain-mint').click();
     await waitFor(()=>w.document.querySelector('#toast').textContent.includes('Wallet or network changed'), 'Changing wallets during the refresh must cancel the pending action');
+    await ready();
     assert.equal(sentTransactions,beforeSwitch,'A stale signer must never reach eth_sendTransaction');
     assert.deepEqual(errors, []);
   } finally { dom.window.close(); await engine.disconnect(); }

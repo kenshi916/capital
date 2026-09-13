@@ -14,12 +14,13 @@ const instrumentLabel = c => c.security || (c.instrument==='Debt'?'Business loan
 const bookmarkIcon = saved => `<svg viewBox="0 0 24 24" aria-hidden="true"${saved?' class="saved-icon"':''}><path d="M6 4h12v17l-6-4-6 4Z"/></svg>`;
 const arrowIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg>';
 function watchButton(c,extraClass='') {return `<button class="watch-button ${extraClass}" data-watch="${c.id}" aria-pressed="${state.watched.has(c.id)}" aria-label="${state.watched.has(c.id)?'Remove':'Add'} ${escapeHtml(c.name)} ${state.watched.has(c.id)?'from':'to'} research watchlist">${bookmarkIcon(state.watched.has(c.id))}</button>`;}
-function opportunityCard(c){return `<article class="opportunity-card">
-  <div class="opportunity-media"><button data-opportunity="${c.id}" aria-label="Read ${escapeHtml(c.name)} business profile"><img src="${c.thumbnail||c.image}" alt="${escapeHtml(c.imageAlt)}" width="720" height="460" loading="eager" decoding="async" style="object-fit:${c.imageFit||'cover'};object-position:${c.imagePosition||'center'}"></button>${watchButton(c)}</div>
-  <div class="opportunity-body"><div class="opportunity-category"><span>${escapeHtml(c.category)}</span><span>${escapeHtml(c.platform)}</span></div><h3><button data-opportunity="${c.id}">${escapeHtml(c.name)}</button></h3><p class="opportunity-description">${escapeHtml(c.description)}</p>
-    <div class="offering-status ${c.availability!=='open'||deadlinePassed(c)?'status-muted':''}">${availabilityLabel(c)}</div><div class="opportunity-metrics"><div><span>${hasCurrentTerms(c)?(c.feeNote?'Minimum, before fees':'Minimum investment'):'Current terms'}</span><strong>${minimumLabel(c)}</strong>${c.feeNote?'<small class="fee-caption">Provider fees apply</small>':''}</div><div><span>Instrument</span><strong class="instrument-value">${escapeHtml(instrumentLabel(c))}</strong></div></div>
-    <button class="profile-link" data-opportunity="${c.id}">Explore business ${arrowIcon}</button>
-  </div></article>`;}
+function opportunityCard(c){return `<article class="opportunity-card business-strip glass-panel">
+  <button class="business-portrait" data-opportunity="${c.id}" aria-label="Read ${escapeHtml(c.name)} business profile"><img class="company-portrait" src="${c.image}" alt="${escapeHtml(c.name)}" width="64" height="64" loading="lazy" decoding="async" style="object-fit:${c.imageFit||'cover'};object-position:${c.imagePosition||'center'}"></button>
+  <div class="business-copy"><div class="micro-label">${escapeHtml(c.platform)} <span aria-hidden="true">·</span> ${escapeHtml(c.category)}</div><h3><button data-opportunity="${c.id}">${escapeHtml(c.name)}</button></h3><p>${escapeHtml(c.description)}</p><span class="offering-status ${c.availability!=='open'||deadlinePassed(c)?'status-muted':''}">${availabilityLabel(c)}</span></div>
+  <div class="strip-metric business-security"><span>Investment type</span><strong>${escapeHtml(instrumentLabel(c))}</strong></div>
+  <div class="strip-metric business-minimum"><span>${hasCurrentTerms(c)?'Minimum investment':'Current terms'}</span><strong>${minimumLabel(c)}</strong>${c.feeNote&&hasCurrentTerms(c)&&c.minimum!==null?'<small>Before provider fees</small>':''}</div>
+  <div class="business-actions">${watchButton(c)}<button class="strip-action" data-opportunity="${c.id}">Explore business ↗</button></div>
+  </article>`;}
 function filteredCompanies(){return opportunities.filter(c=>(state.filter==='All'||c.instrument===state.filter||c.sector===state.filter||(state.filter==='Watchlist'&&state.watched.has(c.id)))&&`${c.name} ${c.sector} ${c.category} ${c.location} ${c.platform}`.toLowerCase().includes(state.query.toLowerCase().trim())).sort((a,b)=>{
   if(state.sort==='name')return a.name.localeCompare(b.name);
   if(state.sort==='minimum')return (hasCurrentTerms(a)&&a.minimum!==null?a.minimum:Infinity)-(hasCurrentTerms(b)&&b.minimum!==null?b.minimum:Infinity);
