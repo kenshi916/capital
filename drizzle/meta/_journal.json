@@ -15,6 +15,13 @@
       "when": 1789336505109,
       "tag": "0001_tearful_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789337516848,
+      "tag": "0002_bizarre_piledriver",
+      "breakpoints": true
     }
   ]
 }

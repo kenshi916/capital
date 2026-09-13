@@ -1,3 +1,5 @@
+import {initLeaderboard} from './forum-leaderboard.js';
+initLeaderboard();
 const $=s=>document.querySelector(s),esc=window.MainstreetDirectory.escapeHtml;
 let session=null,messages=[],reply=null,before=null,nextBefore=null,hasMore=false,busy=false,pending=null,sequence=0;
 const text=$('#forum-message'),form=$('#forum-form'),feed=$('#forum-feed');

@@ -1,4 +1,7 @@
 import {sqliteTable,text,integer,uniqueIndex,index} from 'drizzle-orm/sqlite-core';
+export const companyInterest=sqliteTable('capital_company_interest',{
+ userId:text('user_id').primaryKey(),companyId:text('company_id'),version:integer('version').notNull(),updatedAt:integer('updated_at').notNull()
+},t=>[index('idx_capital_interest_company').on(t.companyId)]);
 export const messages=sqliteTable('capital_messages',{
  id:integer('id').primaryKey({autoIncrement:true}),userId:text('user_id').notNull(),requestId:text('request_id').notNull(),body:text('body').notNull(),parentId:integer('parent_id'),createdAt:integer('created_at').notNull(),hiddenAt:integer('hidden_at'),hiddenBy:text('hidden_by')
 },t=>[uniqueIndex('idx_capital_message_request').on(t.userId,t.requestId),index('idx_capital_message_user_time').on(t.userId,t.createdAt)]);

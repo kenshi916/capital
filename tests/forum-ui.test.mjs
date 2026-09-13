@@ -5,6 +5,7 @@ test('forum safely renders messages, preserves an in-flight reply and retries wi
  let rejectPost,sends=[],failRead=false;const posts=[{id:1,author:'Member abc123',body:'<img src=x onerror=alert(1)>',createdAt:123,isMine:false,hidden:false,canHide:false,canRestore:false,replyTo:null}];
  const response=(data,status=200)=>({ok:status<400,status,json:async()=>data});
  w.fetch=async(url,options={})=>{
+  if(url.endsWith('/company-interest'))return response({companies:[],selectedCompany:null,version:0,totalPicks:0});
   if(url.endsWith('/session'))return response({signedIn:true,author:'Member mine123',isAdmin:false});
   if(options.method==='POST'){const input=JSON.parse(options.body);sends.push(input);if(sends.length===1){posts.unshift({id:2,author:'Member mine123',body:input.body,createdAt:124,isMine:true,hidden:false,canHide:true,canRestore:false,replyTo:{id:1,author:posts[0].author,body:posts[0].body}});return new Promise((resolve,reject)=>{rejectPost=reject;});}return response({message:posts[0],duplicate:true});}
   if(failRead)throw Error('Connection lost');return response({messages:posts,hasMore:false,nextBefore:1});

@@ -1,4 +1,5 @@
 import {requireValue,AppError,hash} from './voting-model.js';
+import {companyInterest} from './company-interest.js';
 const stmt=(db,sql,...args)=>db.prepare(sql).bind(...args);
 const first=(db,sql,...args)=>stmt(db,sql,...args).first();
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}});
@@ -9,6 +10,7 @@ const readPost=(db,id)=>first(db,`SELECT ${fields} FROM capital_messages m LEFT 
 export async function forum(request,db,auth,env,readBody){
  requireValue(auth.user,'Sign in to join the community.',401);
  const url=new URL(request.url),path=url.pathname,method=request.method;
+ if(path==='/api/forum/company-interest')return companyInterest(request,db,auth,readBody);
  if(path==='/api/forum/session'&&method==='GET')return json({signedIn:true,author:member(auth.user),isAdmin:auth.admin,preview:!!env.CAPITAL_PREVIEW});
  if(path==='/api/forum/messages'&&method==='GET'){
   const raw=url.searchParams.get('before'),before=raw===null?null:Number(raw);requireValue(before===null||Number.isSafeInteger(before)&&before>0,'Invalid message cursor.');
