@@ -4,7 +4,7 @@ body[data-view="launch"] .chain-toolbar,body[data-view="launch"] .prototype-noti
 .launch-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;padding:36px 0 28px}
 .launch-heading .eyebrow{font-size:.75rem;color:#7a5b46;letter-spacing:.08em;margin-bottom:18px}
 .launch-heading h1{font-size:clamp(2.25rem,3.5vw,3.5rem);line-height:1.08;letter-spacing:-.05em;font-weight:500}
-.launch-heading h1 em{font-family:var(--serif);font-weight:500}
+.launch-heading h1 em{font-family:var(--font);font-weight:500}
 .launch-heading p:last-child{font-size:1rem;line-height:1.7;color:#66615b;margin-top:17px;max-width:490px}
 .launch-heading-actions{display:flex;gap:10px;flex-wrap:wrap;padding-bottom:4px}
 .launch-status-strip{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid #e5ded3;border-bottom:1px solid #e5ded3;padding:15px 0;font-size:.875rem;line-height:1.7;color:#686159}

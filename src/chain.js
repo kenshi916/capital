@@ -92,7 +92,7 @@ async function connect(id) {
     if (id === 'metamask-connect') {
       closeDialog('#wallet-dialog');
       notify('Opening MetaMask. Approve in your extension or scan its QR code with MetaMask mobile.');
-      sdkModule ||= await import('/metamask-connect.js?v=holders-10');
+      sdkModule ||= await import('/metamask-connect.js?v=equity-11');
       const result = await sdkModule.connectMetaMask(document.body.dataset.view === 'treasury' ? state.chain : 4663);
       selected = { provider: result.provider }; accounts = result.accounts;
     } else accounts = await selected.provider.request({ method: 'eth_requestAccounts' });
@@ -549,7 +549,7 @@ function bindActions() {
   });
 }
 async function initialize() {
-  const [configResponse, artifactResponse] = await Promise.all([fetch('/deployment.json?v=holders-10'), fetch('/contracts/artifacts.json?v=holders-10')]);
+  const [configResponse, artifactResponse] = await Promise.all([fetch('/deployment.json?v=equity-11'), fetch('/contracts/artifacts.json?v=equity-11')]);
   if (!configResponse.ok || !artifactResponse.ok) throw new Error('The testnet application could not load its configuration. Refresh this page.');
   state.config = await configResponse.json(); state.artifacts = await artifactResponse.json();
   const url = new URL(location.href); let saved = null;

@@ -4,7 +4,19 @@ const $ = selector => document.querySelector(selector);
 const money = value => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:Number.isInteger(value)?0:2}).format(value);
 const escapeHtml = value => String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const opportunities = FUNDING_OPPORTUNITIES.map(c=>({availability:'open',statusNote:'The source listed this offering as fundraising on September 13, 2026.',documents:null,additionalSources:[],minimum:null,closing:null,...c}));
-const state = {filter:'All',query:'',sort:'featured',view:'treasury',demoAccount:true,selected:null,profileTab:'overview',watched:new Set(opportunities.filter(c=>['miso-robotics','startengine','atombeam'].includes(c.id)).map(c=>c.id))};
+const SECTOR_GROUPS = [
+  {id:'robotics',label:'Robotics',companies:['miso-robotics','greenfield-robotics','graze-robotics']},
+  {id:'food',label:'Food & drink',companies:['sunday-supper','chainsaw-la-2','demitasse-specialty-coffee']},
+  {id:'software',label:'Software & learning',companies:['simplex-chat','nuralia','atombeam']},
+  {id:'finance',label:'Finance & Web3',companies:['animoca-brands','startengine']},
+  {id:'health',label:'Healthcare',companies:['chatrx','eisana-health']},
+  {id:'energy',label:'Clean energy',companies:['sunpath-solar','jordan-energy']},
+  {id:'housing',label:'Housing',companies:['azure-printed-homes']},
+  {id:'mobility',label:'Mobility & aerospace',companies:['blushift-aerospace','organic-transit']},
+  {id:'hospitality',label:'Hospitality',companies:['eagle-cathedral-city']}
+];
+const sectorFor = c => SECTOR_GROUPS.find(group=>group.companies.includes(c.id));
+const state = {filter:'All',sector:'All',query:'',sort:'featured',view:'treasury',demoAccount:true,selected:null,profileTab:'overview',watched:new Set(opportunities.filter(c=>['miso-robotics','startengine','atombeam'].includes(c.id)).map(c=>c.id))};
 const dateLabel = date => date ? new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',timeZone:'UTC'}).format(new Date(date+'T12:00:00Z')) : 'Not stated';
 const deadlinePassed = c => c.closingAt ? new Date(c.closingAt)<new Date() : c.closing && c.closing<new Date().toISOString().slice(0,10);
 const availabilityLabel = c => c.availability==='closed'?'Previous round closed':c.availability==='unverified'?'Funding status unverified':deadlinePassed(c)?'Listed deadline passed':'Offering reported open';
@@ -21,7 +33,7 @@ function opportunityCard(c){return `<article class="opportunity-card business-st
   <div class="strip-metric business-minimum"><span>${hasCurrentTerms(c)?'Minimum investment':'Current terms'}</span><strong>${minimumLabel(c)}</strong>${c.feeNote&&hasCurrentTerms(c)&&c.minimum!==null?'<small>Before provider fees</small>':''}</div>
   <div class="business-actions">${watchButton(c)}<button class="strip-action" data-opportunity="${c.id}">Explore business ↗</button></div>
   </article>`;}
-function filteredCompanies(){return opportunities.filter(c=>(state.filter==='All'||c.instrument===state.filter||c.sector===state.filter||(state.filter==='Watchlist'&&state.watched.has(c.id)))&&`${c.name} ${c.sector} ${c.category} ${c.location} ${c.platform}`.toLowerCase().includes(state.query.toLowerCase().trim())).sort((a,b)=>{
+function filteredCompanies(){return opportunities.filter(c=>(state.sector==='All'||sectorFor(c)?.id===state.sector)&&(state.filter==='All'||c.instrument===state.filter||c.sector===state.filter||(state.filter==='Watchlist'&&state.watched.has(c.id)))&&`${c.name} ${c.sector} ${c.category} ${sectorFor(c)?.label||''} ${c.location} ${c.platform}`.toLowerCase().includes(state.query.toLowerCase().trim())).sort((a,b)=>{
   if(state.sort==='name')return a.name.localeCompare(b.name);
   if(state.sort==='minimum')return (hasCurrentTerms(a)&&a.minimum!==null?a.minimum:Infinity)-(hasCurrentTerms(b)&&b.minimum!==null?b.minimum:Infinity);
   if(state.sort==='closing')return (hasCurrentTerms(a)&&a.closing?a.closing:'9999').localeCompare(hasCurrentTerms(b)&&b.closing?b.closing:'9999');
@@ -34,6 +46,12 @@ function renderCompanies(){
   $('#company-count').textContent=String(opportunities.length);$('#equity-total').textContent=String(equity.length);$('#loan-total').textContent=String(debt.length);$('#watch-filter-count').textContent=String(state.watched.size);
   $('#results-announcement').textContent=`${list.length} ${list.length===1?'business':'businesses'} shown`;
   document.querySelectorAll('[data-filter]').forEach(b=>{const active=b.dataset.filter===state.filter;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
+  document.querySelectorAll('[data-sector]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sector===state.sector)));
+  const label = state.sector==='All'?'All sectors':SECTOR_GROUPS.find(g=>g.id===state.sector).label;
+  $('#sector-summary').textContent=`${label} · ${list.length} ${list.length===1?'business':'businesses'} shown`;
+}
+function renderSectors(){
+  $('#sector-filters').innerHTML = `<button class="sector-filter" data-sector="All" aria-pressed="true">All sectors <span>${opportunities.length}</span></button>` + SECTOR_GROUPS.map(g=>`<button class="sector-filter" data-sector="${g.id}" aria-pressed="false">${escapeHtml(g.label)} <span>${opportunities.filter(c=>g.companies.includes(c.id)).length}</span></button>`).join('');
 }
 function renderWatchlist(){
   const watched=opportunities.filter(c=>state.watched.has(c.id));$('#watchlist-count').textContent=String(watched.length);
@@ -66,18 +84,19 @@ document.addEventListener('click',event=>{
   const watch=event.target.closest('[data-watch]');if(watch){toggleWatch(watch.dataset.watch);return;}
   const opportunity=event.target.closest('[data-opportunity]');if(opportunity){openOpportunity(opportunity.dataset.opportunity);return;}
   const filter=event.target.closest('[data-filter]');if(filter){state.filter=filter.dataset.filter;renderCompanies();return;}
+  const sector=event.target.closest('[data-sector]');if(sector){state.sector=sector.dataset.sector;renderCompanies();return;}
   const tab=event.target.closest('[data-profile-tab]');if(tab){changeProfileTab(tab.dataset.profileTab);return;}
   const close=event.target.closest('[data-close]');if(close)close.closest('dialog')?.close();
 });
 document.addEventListener('keydown',event=>{const tab=event.target.closest('[data-profile-tab]');if(!tab||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const tabs=['overview','offering','documents'],i=tabs.indexOf(tab.dataset.profileTab);changeProfileTab(tabs[event.key==='Home'?0:event.key==='End'?2:(i+(event.key==='ArrowRight'?1:2))%3]);});
 $('#company-search').addEventListener('input',e=>{state.query=e.target.value;renderCompanies();});$('#company-sort').addEventListener('change',e=>{state.sort=e.target.value;renderCompanies();});
-$('#reset-filters').addEventListener('click',()=>{state.filter='All';state.query='';state.sort='featured';$('#company-search').value='';$('#company-sort').value='featured';renderCompanies();$('#company-search').focus();});
-$('#view-watchlist').addEventListener('click',()=>{state.filter='Watchlist';state.query='';$('#company-search').value='';renderCompanies();});
+$('#reset-filters').addEventListener('click',()=>{state.filter='All';state.sector='All';state.query='';state.sort='featured';$('#company-search').value='';$('#company-sort').value='featured';renderCompanies();$('#company-search').focus();});
+$('#view-watchlist').addEventListener('click',()=>{state.filter='Watchlist';state.sector='All';state.query='';$('#company-search').value='';renderCompanies();});
 ['about-button','footer-about'].forEach(id=>$(`#${id}`).addEventListener('click',()=>$('#about-dialog').showModal()));
 ['ledger-button','all-activity-button'].forEach(id=>$(`#${id}`).addEventListener('click',()=>$('#ledger-dialog').showModal()));
 document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}}));
 function routeFromHash(){const hash=location.hash.slice(1);if(hash==='main')return;setView(hash||(new URL(location.href).searchParams.has('treasury')?'treasury':'launch'));}
 window.addEventListener('hashchange',routeFromHash);
-renderCompanies();renderWatchlist();routeFromHash();
+renderSectors();renderCompanies();renderWatchlist();routeFromHash();
 
 window.MainstreetDirectory={opportunities,openOpportunity,escapeHtml,navigate};
