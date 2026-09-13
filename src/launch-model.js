@@ -52,7 +52,7 @@ export const PRODUCTION_BLOCKERS = [
   'Implement and review production custody and distribution contracts, then verify their deployment.',
   'Connect and test live settlement, accounting, monitoring and payout operations.'
 ];
-export const blankPlan = () => ({ fields: Object.fromEntries(FIELDS.map(([key]) => [key, ''])), evidence: [] });
+export const blankPlan = () => ({ fields: { ...Object.fromEntries(FIELDS.map(([key]) => [key, ''])), networkName: 'Robinhood Chain', chainId: '4663' }, evidence: [] });
 export function cents(value) {
   if (!/^\d{1,12}(\.\d{1,2})?$/.test(value)) throw new Error('Use a nonnegative USD amount with at most two decimal places.');
   const [whole, decimal = ''] = value.split('.');

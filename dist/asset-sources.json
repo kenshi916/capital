@@ -1,0 +1,109 @@
+{
+  "checked": "2026-09-13",
+  "assets": [
+    {
+      "image": "/assets/animoca-brands.jpg",
+      "url": "https://static.wixstatic.com/media/0de4af_669dd345bbd44c578eb561cdf488f475~mv2.jpg/v1/fill/w_2083%2Ch_1258%2Cal_c/0de4af_669dd345bbd44c578eb561cdf488f475~mv2.jpg",
+      "source": "https://www.animocabrands.com/animoca-brands-completes-usd138888888-capital-raise-with-second-tranche-of-usd50000000",
+      "attribution": "Animoca Brands",
+      "alt": "Official blue Animoca Brands logo on white.",
+      "kind": "official brand asset",
+      "width": 2083,
+      "height": 1258,
+      "rightsNote": "Company source found through web image search, downloaded and visually inspected; copyright retained by company."
+    },
+    {
+      "image": "/assets/sunday-supper.jpg",
+      "url": "https://img-va.myshopline.com/image/store/1779911196412/c59a035b850f49359ee64f6dc5ed1ce3.jpg",
+      "source": "https://sundaysupper.com/",
+      "attribution": "Company / issuer",
+      "alt": "A woman holding a tray of Sunday Supper fried mozzarella appetizers.",
+      "kind": "photo",
+      "width": 1910,
+      "height": 1080,
+      "rightsNote": "Public company promotional asset; copyright retained by owner. No open-content license verified."
+    },
+    {
+      "image": "/assets/blushift-aerospace.png",
+      "url": "https://uploads.wefunder.com/uploads/image_upload/file/1363808/MAREVL_Engine_Test.png",
+      "source": "https://wefunder.com/blushiftaerospace",
+      "attribution": "Company / issuer",
+      "alt": "The bluShift MAREVL rocket engine firing during a test.",
+      "kind": "photo",
+      "width": 970,
+      "height": 551,
+      "rightsNote": "Public company promotional asset; copyright retained by owner. No open-content license verified."
+    },
+    {
+      "image": "/assets/organic-transit.jpg",
+      "url": "https://uploads.wefunder.com/uploads/image_upload/file/1329680/company-story-image.jpeg",
+      "source": "https://wefunder.com/organic.transit",
+      "attribution": "Company / issuer",
+      "alt": "A white Organic Transit ELF 2FR vehicle beside a lake.",
+      "kind": "photo",
+      "width": 2880,
+      "height": 1620,
+      "rightsNote": "Public company promotional asset; copyright retained by owner. No open-content license verified."
+    },
+    {
+      "image": "/assets/simplex-chat.jpg",
+      "url": "https://simplex.chat/img/share_simplex.jpg",
+      "source": "https://simplex.chat/",
+      "attribution": "Company / issuer",
+      "alt": "Official SimpleX Chat logo on a blue gradient.",
+      "kind": "brand asset",
+      "width": 320,
+      "height": 320,
+      "rightsNote": "Public company promotional asset; copyright retained by owner. No open-content license verified."
+    },
+    {
+      "image": "/assets/eagle-cathedral-city.jpg",
+      "url": "https://uploads.wefunder.com/uploads/image_upload/file/1395508/IMG_3718_2.jpeg",
+      "source": "https://wefunder.com/eagle.cathedral.city.limited",
+      "attribution": "Company / issuer",
+      "alt": "Issuer visualization of the proposed Eagle Cathedral City exterior.",
+      "kind": "issuer venue visualization",
+      "width": 1233,
+      "height": 757,
+      "rightsNote": "Public company promotional asset; copyright retained by owner. No open-content license verified."
+    },
+    {
+      "image": "/assets/chatrx.jpg",
+      "url": "https://www.chatrx.md/wp-content/uploads/2025/11/ChatRx-Main-Image-1024x683-1.jpg",
+      "source": "https://www.chatrx.md/",
+      "attribution": "Company / issuer",
+      "alt": "Official ChatRx brand graphic.",
+      "kind": "brand asset",
+      "width": 1024,
+      "height": 683,
+      "rightsNote": "Public company promotional asset; copyright retained by owner. No open-content license verified."
+    },
+    {
+      "image": "/assets/eisana-health.jpg",
+      "url": "https://uploads.wefunder.com/uploads/image_upload/file/1356321/use_cases.jpg",
+      "source": "https://wefunder.com/eisana.health",
+      "attribution": "Company / issuer",
+      "alt": "People demonstrating Eisana cooling gloves, booties, and portable equipment.",
+      "kind": "photo",
+      "width": 1109,
+      "height": 352,
+      "rightsNote": "Public company promotional asset; copyright retained by owner. No open-content license verified."
+    },
+    {
+      "image": "/assets/nuralia.png",
+      "url": "https://uploads.wefunder.com/uploads/image_upload/file/1388639/Nuralia___Wefunder_slides___June_2026.pptx__1_.png",
+      "source": "https://wefunder.com/nuralia.ai",
+      "attribution": "Company / issuer",
+      "alt": "Official Nuralia slide describing its learning-design software.",
+      "kind": "issuer product infographic",
+      "width": 960,
+      "height": 540,
+      "rightsNote": "Public company promotional asset; copyright retained by owner. No open-content license verified."
+    }
+  ],
+  "metamask": {
+    "source": "https://metamask.io/assets",
+    "asset": "/assets/metamask.svg",
+    "note": "Official MetaMask fox from its brand asset pack."
+  }
+}

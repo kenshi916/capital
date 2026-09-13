@@ -59,7 +59,7 @@ test('published UI completes wallet deployment, fee deposit, purchase, payment, 
     };
     w.eval(read('dist/opportunities.js') + '\n' + read('dist/app.js')); w.eval(read('dist/chain.js'));
     await waitFor(() => w.document.documentElement.dataset.chainApp === 'ready', 'Application did not initialize');
-    assert.equal(w.document.querySelectorAll('.opportunity-card').length, 10);
+    assert.equal(w.document.querySelectorAll('.opportunity-card').length, 19);
     assert.equal(w.document.querySelector('#total-assets').textContent, '—', 'A disconnected page must not show fictional balances');
     w.document.querySelector('#wallet-button').click();
     w.document.querySelector('[data-wallet-provider="injected"]').click();

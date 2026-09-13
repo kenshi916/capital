@@ -5,24 +5,28 @@
   "networks": {
     "46630": {
       "name": "Robinhood Chain Testnet",
-      "rpcUrls": ["https://rpc.testnet.chain.robinhood.com/rpc", "https://robinhood-sepolia-rpc.publicnode.com"],
+      "rpcUrls": [
+        "https://rpc.testnet.chain.robinhood.com",
+        "https://robinhood-sepolia-rpc.publicnode.com"
+      ],
       "explorer": "https://explorer.testnet.chain.robinhood.com",
       "faucet": "https://docs.robinhood.com/chain/"
     },
     "11155111": {
       "name": "Ethereum Sepolia",
-      "rpcUrls": ["https://ethereum-sepolia-rpc.publicnode.com"],
+      "rpcUrls": [
+        "https://ethereum-sepolia-rpc.publicnode.com"
+      ],
       "explorer": "https://sepolia.etherscan.io",
       "faucet": "https://ethereum.org/en/developers/docs/networks/#sepolia"
     }
   },
   "pons": {
     "chainId": 4663,
-    "status": "not_connected",
-    "source": "https://docs.ponsfamily.com/#fees",
+    "status": "read_only_setup",
+    "source": "https://docs.ponsfamily.com/v2",
     "checkedAt": "2026-09-13",
-    "feeAssets": ["launch token", "WETH"],
-    "currentCreatorShare": "70% of pool fee revenue; token-specific split is fixed at launch",
-    "note": "No launch token, payout wallet, swap route, or live fee collection is configured. Test deposits are mUSD simulations."
+    "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+    "note": "No Mainstreet launch token or fee recipient supplied. V2 terms are token-specific. Public launch access is described as restricted in the current documentation; verify canLaunch for the creator."
   }
 }

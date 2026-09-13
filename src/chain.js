@@ -5,8 +5,9 @@ const $ = s => document.querySelector(s);
 const providers = new Map();
 const state = { config: null, artifacts: null, chain: 46630, account: null, injected: null, browser: null, rpc: null, treasury: null, address: null, data: null, busy: false, generation: 0, readSequence: 0, epochLimit: 25, selected: null, logs: [], owner: false, evidence: null };
 let providerListeners = null;
+let connecting = false, connectionSequence = 0, connectedWithSDK = false, sdkModule = null;
 const text = (selector, value) => { const el = $(selector); if (el) el.textContent = value; };
-const network = () => state.config.networks[state.chain];
+const network = () => state.config?.networks[state.chain] || { name: 'Robinhood Chain Testnet', rpcUrls: ['https://rpc.testnet.chain.robinhood.com'], explorer: 'https://explorer.testnet.chain.robinhood.com', faucet: 'https://docs.robinhood.com/chain/' };
 const link = (kind, value) => `${network().explorer}/${kind}/${value}`;
 const closeDialog = selector => $(selector)?.close();
 const formValue = (form, name) => String(new FormData(form).get(name) || '').trim();
@@ -30,7 +31,7 @@ function installDialogs() {
     <div id="chain-transaction" class="chain-transaction" role="status" aria-live="polite" hidden></div>
     <dialog id="chain-fee-dialog" class="info-dialog" aria-labelledby="chain-fee-title"><button class="icon-button dialog-close" data-close aria-label="Close fee deposit">×</button><p class="eyebrow">TEST THE FEE FLOW</p><h2 id="chain-fee-title">Fund the test treasury.</h2><p class="dialog-intro">Move mUSD from your connected wallet into the treasury. This simulates received trading fees; it is not a Pons fee collection.</p><form id="chain-fee-form" class="chain-form"><label>Test dollars to deposit<input name="amount" inputmode="decimal" value="5000" required></label><div class="chain-inline-note">Wallet → exact mUSD approval → treasury deposit. No real dollars move.</div><button class="button button-dark" type="submit">Deposit test fees</button></form></dialog>
     <dialog id="chain-admin-dialog" class="chain-admin-dialog" aria-labelledby="chain-admin-title"><button class="icon-button dialog-close" data-close aria-label="Close treasury management">×</button><p class="eyebrow">TREASURY ADMINISTRATION</p><h2 id="chain-admin-title">Manage your test treasury.</h2><p class="dialog-intro" id="chain-admin-note">The administrator signs every management transaction.</p><div class="chain-admin-tabs" role="tablist" aria-label="Treasury management"><button role="tab" id="admin-tab-purchases" data-admin-tab="purchases" aria-controls="admin-purchases" aria-selected="true">Purchases</button><button role="tab" id="admin-tab-payments" data-admin-tab="payments" aria-controls="admin-payments" aria-selected="false" tabindex="-1">Payments</button><button role="tab" id="admin-tab-members" data-admin-tab="members" aria-controls="admin-members" aria-selected="false" tabindex="-1">Participants</button><button role="tab" id="admin-tab-payouts" data-admin-tab="payouts" aria-controls="admin-payouts" aria-selected="false" tabindex="-1">Distributions</button></div>
-      <section id="admin-purchases" role="tabpanel" aria-labelledby="admin-tab-purchases"><form id="chain-purchase-form" class="chain-form"><fieldset data-owner-form><div class="chain-form-grid"><label>Business<select name="business" id="chain-purchase-business"></select></label><label>Test acquisition cost · mUSD<input name="cost" inputmode="decimal" value="2000" required></label><label>Security description<input name="security" id="chain-purchase-security" maxlength="120" required></label><label>Original offering URL<input name="source" id="chain-purchase-source" type="url" maxlength="500" required></label></div><p class="chain-inline-note">This reserves test dollars. Open the resulting record to attach a test document and settle to your administrator wallet. It does not submit an order to a funding platform.</p><button class="button button-dark" type="submit">Reserve test purchase</button></fieldset></form><div class="chain-separator"></div><h3>Preparing a real investment?</h3><p>Use an approved entity account and the provider’s checkout. Mainstreet does not have access to your investing accounts.</p><button class="text-button" data-real-setup>Open real purchase worksheet ↗</button><div class="chain-integration-note"><strong>Pons fee connection · not active</strong><p>Current Pons documentation describes creator rewards in the launch token and WETH. Those assets need to be collected and reconciled before any dollar-funded purchase. No launch token or payout wallet is configured.</p><a href="https://docs.ponsfamily.com/#fees" target="_blank" rel="noopener noreferrer">Read Pons fee mechanics ↗</a></div></section>
+      <section id="admin-purchases" role="tabpanel" aria-labelledby="admin-tab-purchases"><form id="chain-purchase-form" class="chain-form"><fieldset data-owner-form><div class="chain-form-grid"><label>Business<select name="business" id="chain-purchase-business"></select></label><label>Test acquisition cost · mUSD<input name="cost" inputmode="decimal" value="2000" required></label><label>Security description<input name="security" id="chain-purchase-security" maxlength="120" required></label><label>Original offering URL<input name="source" id="chain-purchase-source" type="url" maxlength="500" required></label></div><p class="chain-inline-note">This reserves test dollars. Open the resulting record to attach a test document and settle to your administrator wallet. It does not submit an order to a funding platform.</p><button class="button button-dark" type="submit">Reserve test purchase</button></fieldset></form><div class="chain-separator"></div><h3>Preparing a real investment?</h3><p>Use an approved entity account and the provider’s checkout. Mainstreet does not have access to your investing accounts.</p><button class="text-button" data-real-setup>Open real purchase worksheet ↗</button><div class="chain-integration-note"><strong>Pons fee connection · not active</strong><p>Pons V1 and V2 use different fee mechanics. Use Launch setup to check the exact V2 token, quote asset and creator recipient. Fees must be collected and reconciled before funding an outside investment.</p><a href="https://docs.ponsfamily.com/v2" target="_blank" rel="noopener noreferrer">Read Pons fee mechanics ↗</a></div></section>
       <section id="admin-payments" role="tabpanel" aria-labelledby="admin-tab-payments" hidden><form id="chain-payment-form" class="chain-form"><fieldset data-owner-form><label>Recorded test investment<select name="investment" id="chain-payment-investment" required></select></label><div class="chain-form-grid"><label>Principal repayment · mUSD<input name="principal" inputmode="decimal" value="0" required></label><label>Investment income · mUSD<input name="income" inputmode="decimal" value="1200" required></label></div><label>Unique test payment reference<input name="reference" maxlength="160" required placeholder="TEST-PAYMENT-001"></label><p class="chain-inline-note">Your wallet deposits the full payment. Principal reduces outstanding cost; income becomes eligible for a funded distribution. A reference hash prevents this receipt being recorded twice.</p><button class="button button-dark" type="submit">Deposit and record test payment</button></fieldset></form></section>
       <section id="admin-members" role="tabpanel" aria-labelledby="admin-tab-members" hidden><form id="chain-member-form" class="chain-form"><fieldset data-owner-form><div class="chain-form-grid"><label>Participant wallet<input name="account" id="chain-member-account" required placeholder="0x…"></label><label>Nontransferable test units<input name="units" inputmode="numeric" type="number" min="0" max="1000000000000000000" step="1" value="60" required></label></div><button class="text-button" type="button" id="chain-use-wallet">Use my connected wallet</button><p class="chain-inline-note">For a 60/40 test, assign 60 units to one wallet and 40 to another. Units affect future distributions only. They are not real equity or the Pons launch token.</p><button class="button button-dark" type="submit">Save participant units</button></fieldset></form><div id="chain-members-list" class="chain-members-list"></div></section>
       <section id="admin-payouts" role="tabpanel" aria-labelledby="admin-tab-payouts" hidden><form id="chain-reserve-form" class="chain-form"><fieldset data-owner-form><label>Cash to retain for expenses / taxes · mUSD<input name="reserve" inputmode="decimal" value="200" required></label><button class="button button-light" type="submit">Set cash reserve</button></fieldset></form><div class="chain-separator"></div><form id="chain-distribution-form" class="chain-form"><fieldset data-owner-form><div class="chain-form-grid"><label>Distribution budget · mUSD<input name="budget" id="chain-distribution-budget" inputmode="decimal" value="1000" required></label><label>Distribution description<input name="memo" maxlength="240" value="Test business income distribution" required></label></div><div id="chain-payout-preview" class="chain-inline-note">Assign participants and record income first.</div><p class="chain-inline-note">The contract freezes allocations and transfers their total into the claim contract. Allocated funds cannot be withdrawn by the administrator. Rounding remainder stays in the treasury.</p><button class="button button-dark" type="submit">Fund distribution</button></fieldset></form></section>
@@ -54,7 +55,11 @@ function updateRealBusiness() { const c = window.MainstreetDirectory.opportuniti
 
 function renderWalletOptions() {
   const box = $('#chain-wallet-options');
-  box.innerHTML = [...providers].map(([id, p]) => `<button class="chain-wallet-option" data-wallet-provider="${esc(id)}"><span>${esc(p.info.name)}</span><span>Connect ↗</span></button>`).join('') || '<p class="chain-inline-note">No installed wallet was detected. Install MetaMask, or open this page in the MetaMask mobile browser.</p>';
+  const mobileURL = ['localhost','127.0.0.1'].includes(location.hostname) ? `mainstreet-equity.kenshipops.chatgpt.site/${location.search}${location.hash}` : `${location.host}${location.pathname}${location.search}${location.hash}`;
+  $('#chain-mobile-wallet').href = `https://link.metamask.io/dapp/${mobileURL}`;
+  const isMetaMask = p => ['io.metamask','io.metamask.mobile','io.metamask.flask'].includes(p.info.rdns) || p.provider.isMetaMask;
+  const entries = [...providers], meta = entries.find(([, p]) => isMetaMask(p));
+  box.innerHTML = `<button class="chain-wallet-option metamask-option" data-wallet-provider="${esc(meta?.[0] || 'metamask-connect')}" ${connecting ? 'disabled' : ''}><img src="/assets/metamask.svg" alt="" width="40" height="40"><span><strong>MetaMask</strong><small>${connecting ? 'Waiting for wallet approval…' : meta ? 'Connect your browser wallet' : 'Connect with mobile QR or browser extension'}</small></span><span aria-hidden="true">↗</span></button>` + entries.filter(([,p])=>!isMetaMask(p)).map(([id,p])=>`<button class="chain-wallet-option" data-wallet-provider="${esc(id)}" ${connecting ? 'disabled' : ''}><span>${esc(p.info.name)}</span><span>Connect ↗</span></button>`).join('');
   $('#chain-connected-wallet').hidden = !state.account;
   if (state.account) $('#chain-connected-wallet').innerHTML = `<div class="chain-inline-note"><strong>Connected wallet</strong><p class="chain-address">${esc(state.account)}</p><button class="text-button" id="chain-disconnect">Disconnect from this page</button></div>`;
 }
@@ -76,10 +81,25 @@ function detachProviderListeners() {
   state.injected.removeListener('chainChanged', providerListeners.chain);
 }
 async function connect(id) {
-  const selected = providers.get(id); if (!selected) throw new Error('Choose an installed wallet.');
+  if (connecting) throw new Error('A connection request is already open. Finish it in MetaMask.');
+  let selected = providers.get(id);
+  if (!selected && id !== 'metamask-connect') throw new Error('Choose an installed wallet.');
   if (state.busy) throw new Error('Finish the current transaction first.');
-  const accounts = await selected.provider.request({ method: 'eth_requestAccounts' });
+  const sequence = ++connectionSequence;
+  connecting = true; renderWalletOptions();
+  let accounts;
+  try {
+    if (id === 'metamask-connect') {
+      closeDialog('#wallet-dialog');
+      notify('Opening MetaMask. Approve in your extension or scan its QR code with MetaMask mobile.');
+      sdkModule ||= await import('/metamask-connect.js?v=pons-9');
+      const result = await sdkModule.connectMetaMask(document.body.dataset.view === 'treasury' ? state.chain : 4663);
+      selected = { provider: result.provider }; accounts = result.accounts;
+    } else accounts = await selected.provider.request({ method: 'eth_requestAccounts' });
+  } finally { if (sequence === connectionSequence) { connecting = false; renderWalletOptions(); } }
+  if (sequence !== connectionSequence) return;
   if (!accounts.length) throw new Error('No wallet account was connected.');
+  connectedWithSDK = id === 'metamask-connect';
   detachProviderListeners(); state.injected = selected.provider; state.account = getAddress(accounts[0]); state.browser = new BrowserProvider(state.injected, 'any'); state.generation++;
   providerListeners = {
     accounts: accounts => { state.generation++; state.account = accounts[0] ? getAddress(accounts[0]) : null; state.browser = state.account ? new BrowserProvider(state.injected, 'any') : null; state.data = null; clearBalances(); updateWallet(); refresh().catch(showReadError); },
@@ -88,22 +108,24 @@ async function connect(id) {
   state.injected.on?.('accountsChanged', providerListeners.accounts); state.injected.on?.('chainChanged', providerListeners.chain);
   updateWallet(); closeDialog('#wallet-dialog'); await refresh();
 }
-function disconnect() { detachProviderListeners(); state.generation++; state.account = null; state.injected = null; state.browser = null; state.owner = false; state.data = null; clearBalances(); updateWallet(); refresh().catch(showReadError); }
+function disconnect() { connectionSequence++; connecting = false; detachProviderListeners(); if (connectedWithSDK) sdkModule?.disconnectMetaMask().catch(()=>{}); connectedWithSDK = false; state.generation++; state.account = null; state.injected = null; state.browser = null; state.owner = false; state.data = null; clearBalances(); updateWallet(); refresh().catch(showReadError); }
 function updateWallet() {
   text('#wallet-button span', state.account ? shortAddress(state.account) : 'Connect wallet');
   $('#wallet-empty').hidden = !!state.account; $('#holdings-content').hidden = !state.account;
   text('#chain-holder-wallet', state.account || 'Wallet not connected');
   text('#chain-holder-network', network().name);
+  document.dispatchEvent(new CustomEvent('mainstreet:wallet', { detail: { account: state.account } }));
   renderWalletOptions(); updateControls();
 }
 function updateControls() {
   const ready = !!state.treasury && !!state.data;
-  $('#chain-deploy').disabled = state.busy;
+  $('#chain-deploy').disabled = state.busy || !state.config || !state.artifacts;
   $('#chain-network').disabled = state.busy;
   $('#chain-share').disabled = !ready;
   $('#chain-mint').disabled = !ready || !state.account || state.busy;
   $('#chain-fee-button').disabled = !ready || !state.account || state.busy;
   $('#chain-admin-button').disabled = !ready || state.busy;
+  $('#chain-export-holder').disabled = !ready || !state.account;
   document.querySelectorAll('[data-owner-form]').forEach(el => el.disabled = !state.owner || state.busy || !ready);
   document.querySelectorAll('[data-chain-claim]').forEach(el => el.disabled = state.busy || !state.account || !ready);
   document.querySelectorAll('#chain-fee-form button[type="submit"], #chain-record-form button[type="submit"], #chain-cancel-purchase').forEach(el => el.disabled = state.busy || !ready);
@@ -243,7 +265,7 @@ async function refresh() {
   const t = new Contract(treasuryAddress, state.artifacts.MainstreetTreasury.abi, provider), at = { blockTag: block };
   const fields = ['owner','asset','distributions','startedAtBlock','cash','availableCash','totalFees','outstandingCost','reservedForOrders','cashReserve','undistributedIncome','totalIncome','totalDistributed','totalUnits','investmentCount','memberCount'];
   const values = await Promise.all(fields.map(name => t[name](at)));
-  const d = Object.fromEntries(fields.map((name, i) => [name, values[i]])); d.block = block;
+  const d = Object.fromEntries(fields.map((name, i) => [name, values[i]])); d.block = block; d.claimReceipts = {}; d.historyAvailable = false;
   const [assetCode, distributionCode] = await Promise.all([provider.getCode(d.asset, block), provider.getCode(d.distributions, block)]);
   if (!sameContract(assetCode, state.artifacts.MainstreetTestDollar) || !sameContract(distributionCode, state.artifacts.MainstreetDistributions)) throw new Error('The treasury’s token or distribution contract could not be verified.');
   const dist = new Contract(d.distributions, state.artifacts.MainstreetDistributions.abi, provider);
@@ -289,17 +311,29 @@ function renderBalances() {
 const investmentStatus = value => ['Reserved test purchase','Test purchase recorded','Cancelled','Test principal repaid'][Number(value)];
 function renderInvestments() {
   const d = state.data; text('#chain-investment-count', String(d.investments.length));
-  const rows = (holder = false) => d.investments.filter(inv => !holder || [1,3].includes(Number(inv.value.status))).map(({ id, value: inv }) => {
+  const rows = (holder = false) => d.investments.filter(inv => !holder || ((d.units || 0n) > 0n && [1,3].includes(Number(inv.value.status)))).map(({ id, value: inv }) => {
     const cost = holder ? (d.totalUnits > 0n ? (inv.cost - inv.principalRepaid) * (d.units || 0n) / d.totalUnits : 0n) : inv.cost - inv.principalRepaid;
     return `<tr><td><button class="table-company" data-chain-investment="${id}"><span class="company-logo"><span>${esc(inv.name.slice(0,1))}</span></span><span><strong>${esc(inv.name)}</strong><small>${esc(inv.security)}</small></span></button></td><td class="table-value">${dollars(cost)}</td><td><span class="chain-record-status">${investmentStatus(inv.status)}</span></td><td><button class="row-button" data-chain-investment="${id}" aria-label="Open ${esc(inv.name)} test record">↗</button></td></tr>`;
   }).join('');
   $('#treasury-table').innerHTML = rows() || '<tr><td colspan="4" class="chain-empty-cell">No investment records yet. The administrator can reserve the first test purchase.</td></tr>';
-  $('#holdings-table').innerHTML = rows(true) || '<tr><td colspan="4" class="chain-empty-cell">No recorded test purchases in this treasury.</td></tr>';
+  $('#holdings-table').innerHTML = rows(true) || '<tr><td colspan="4" class="chain-empty-cell">No current participation in recorded test purchases. Any earlier funded allocations appear below.</td></tr>';
 }
 function renderClaims() {
   const d = state.data;
   $('#chain-claims').innerHTML = d.epochs.length ? d.epochs.map(({ id, value, allocation, claimed }) => `<article class="chain-claim-card surface"><div class="chain-claim-top"><span class="eyebrow">DISTRIBUTION ${id + 1}</span><span class="chain-record-status">${claimed ? 'Claimed' : allocation > 0n ? 'Funded · ready to claim' : 'No allocation for this wallet'}</span></div><h3>${esc(value.memo)}</h3><strong class="chain-claim-amount">${dollars(allocation)} <small>mUSD</small></strong><p>${dollars(value.total)} mUSD funded for all recipients · snapshot block ${value.snapshotBlock.toString()}</p><div class="chain-claim-bottom"><a href="${link('address', d.distributions)}" target="_blank" rel="noopener noreferrer">View claim contract ↗</a>${allocation > 0n && !claimed ? `<button class="button button-dark" data-chain-claim="${id}">Claim ${dollars(allocation)} mUSD</button>` : `<span>${claimed ? 'Paid to your wallet' : 'Existing allocations cannot be changed'}</span>`}</div></article>`).join('') : '<div class="chain-empty surface"><h3>No funded distributions yet.</h3><p>After recording a test payment and assigning participants, the administrator can fund the first distribution.</p></div>';
   if (d.epochCount > d.epochs.length) $('#chain-claims').insertAdjacentHTML('beforeend', `<button class="button button-light" id="chain-more-claims">Load earlier distributions (${d.epochs.length} of ${d.epochCount} shown)</button>`);
+  [...$('#chain-claims').querySelectorAll('.chain-claim-card')].forEach((card,index) => {
+    const epoch = d.epochs[index], receipt = d.claimReceipts[epoch.id];
+    const date = new Date(Number(epoch.value.createdAt)*1000).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'});
+    card.insertAdjacentHTML('beforeend', `<p class="section-note">Funded ${esc(date)} UTC${receipt ? ` · <a href="${link('tx',receipt.hash)}" target="_blank" rel="noopener noreferrer">Your claim receipt ↗</a>` : epoch.claimed ? ' · Payment confirmed by contract; receipt not in the loaded history' : ''}</p>`);
+  });
+}
+function exportHolder() {
+  requireTreasury(); if (!state.account) throw new Error('Connect your wallet first.'); const d = state.data;
+  download('mainstreet-test-holder-statement.json', { type:'TESTNET HOLDER STATEMENT — NO REAL SHARES OR MONEY', createdAt:new Date().toISOString(), chainId:state.chain, block:d.block, treasury:state.address, wallet:state.account, currency:'mUSD — NO MONETARY VALUE', currentUnits:d.units.toString(), totalCurrentUnits:d.totalUnits.toString(), lifetimeAllocated:exactDollars(d.allocated), lifetimeClaimed:exactDollars(d.claimed), currentlyClaimable:exactDollars(d.allocated-d.claimed),
+    investments:d.investments.filter(x=>[1,3].includes(Number(x.value.status))).map(({id,value:v})=>({id,business:v.name,instrument:v.security,source:safeURL(v.source),treasuryCostRemaining:exactDollars(v.cost-v.principalRepaid),attributedCost:d.totalUnits ? exactDollars((v.cost-v.principalRepaid)*d.units/d.totalUnits) : '0',documentSHA256:v.documentHash,paymentReferenceHash:v.receiptHash})),
+    distributions:d.epochs.map(e=>({id:e.id,memo:e.value.memo,snapshotBlock:e.value.snapshotBlock.toString(),fundedAt:new Date(Number(e.value.createdAt)*1000).toISOString(),allocation:exactDollars(e.allocation),claimed:e.claimed,receipt:d.claimReceipts[e.id]||null})),
+    coverage:{distributionsLoaded:d.epochs.length,totalDistributions:d.epochCount,receiptHistoryAvailable:d.historyAvailable,receiptLookbackBlocks:10000},notice:'Current units determine attributed cost, not past distribution allocations. Test investment records are administrator attestations, not actual company holdings. Receipt coverage is limited; lifetime totals are read from the contract.' });
 }
 function renderAdmin() {
   const d = state.data;
@@ -341,6 +375,9 @@ async function loadLogs(provider, treasury, dist, d, sequence) {
     return logs.map(log => { try { return { ...log, parsed: c.interface.parseLog(log) }; } catch { return null; } }).filter(Boolean);
   }, 4);
   if (sequence !== state.readSequence) return;
+  d.historyAvailable = true;
+  d.claimReceipts = Object.fromEntries(batches.flat().filter(log=>log.parsed?.name === 'Claimed' && state.account && log.parsed.args.account.toLowerCase() === state.account.toLowerCase()).map(log=>[Number(log.parsed.args.epoch),{hash:log.transactionHash,block:log.blockNumber}]));
+  renderClaims();
   const rows = batches.flat().sort((a,b) => b.blockNumber - a.blockNumber || b.index - a.index).map(log => {
     const p = log.parsed; if (!p) return null;
     let label, movement = '—';
@@ -372,8 +409,17 @@ function requireTreasury() { if (!state.treasury || !state.data) throw new Error
 function requireOwner() { requireTreasury(); if (!state.owner) throw new Error('Connect the treasury administrator’s wallet to manage this treasury.'); }
 function safely(task) { return Promise.resolve().then(task).catch(error => notify(errorMessage(error), true)); }
 function bindForm(id, handler) { $(id).addEventListener('submit', event => { event.preventDefault(); safely(() => handler(event.target)); }); }
-function bindActions() {
+function bindWalletActions() {
   $('#wallet-button').addEventListener('click', () => { registerProviders(); openDialog('#wallet-dialog'); });
+  document.addEventListener('click', event => safely(async () => {
+    const target = event.target;
+    if (target.closest('[data-chain-connect]')) { registerProviders(); openDialog('#wallet-dialog'); }
+    const selected = target.closest('[data-wallet-provider]'); if (selected) await connect(selected.dataset.walletProvider);
+    if (target.closest('#chain-disconnect')) { disconnect(); closeDialog('#wallet-dialog'); }
+  }));
+}
+function bindActions() {
+  $('#chain-export-holder').addEventListener('click',()=>safely(exportHolder));
   $('#chain-deploy').addEventListener('click', () => safely(deploy));
   $('#chain-refresh').addEventListener('click', () => refresh().catch(showReadError));
   $('#chain-refresh-claims').addEventListener('click', () => refresh().catch(showReadError));
@@ -450,9 +496,6 @@ function bindActions() {
   });
   document.addEventListener('click', event => safely(async () => {
     const target = event.target;
-    if (target.closest('[data-chain-connect]')) { registerProviders(); openDialog('#wallet-dialog'); }
-    const selected = target.closest('[data-wallet-provider]'); if (selected) await connect(selected.dataset.walletProvider);
-    if (target.closest('#chain-disconnect')) { disconnect(); closeDialog('#wallet-dialog'); }
     if (target.closest('[data-real-setup]')) { closeDialog('#chain-admin-dialog'); openDialog('#chain-real-dialog'); }
     const tab = target.closest('[data-admin-tab]'); if (tab) adminTab(tab.dataset.adminTab);
     const record = target.closest('[data-chain-investment]'); if (record) { requireTreasury(); renderRecord(Number(record.dataset.chainInvestment)); openDialog('#chain-investment-dialog'); }
@@ -499,7 +542,7 @@ function bindActions() {
   });
 }
 async function initialize() {
-  const [configResponse, artifactResponse] = await Promise.all([fetch('/deployment.json?v=launch-8'), fetch('/contracts/artifacts.json?v=launch-8')]);
+  const [configResponse, artifactResponse] = await Promise.all([fetch('/deployment.json?v=pons-9'), fetch('/contracts/artifacts.json?v=pons-9')]);
   if (!configResponse.ok || !artifactResponse.ok) throw new Error('The testnet application could not load its configuration. Refresh this page.');
   state.config = await configResponse.json(); state.artifacts = await artifactResponse.json();
   const url = new URL(location.href); let saved = null;
@@ -509,8 +552,8 @@ async function initialize() {
   const selectedAddress = url.searchParams.get('treasury') || (!url.searchParams.has('network') && saved?.chain === state.chain ? saved?.address : null) || (state.chain === state.config.defaultChainId ? state.config.treasury : null);
   if (selectedAddress) { try { state.address = address(selectedAddress); } catch { notify('The treasury address in this link is invalid. Choose a valid contract.', true); } }
   $('#chain-network').value = String(state.chain); installDialogs(); bindActions(); registerProviders(); updateWallet();
-  $('#chain-mobile-wallet').href = `https://metamask.app.link/dapp/${location.host}${location.pathname}${location.search}${location.hash}`;
   document.documentElement.dataset.chainApp = 'ready';
   await refresh();
 }
+bindWalletActions(); registerProviders(); updateWallet();
 initialize().catch(error => { status('Setup needs attention', true); text('#chain-updated', errorMessage(error)); notify(errorMessage(error), true); $('#chain-deploy').disabled = true; });

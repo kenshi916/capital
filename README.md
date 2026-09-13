@@ -2,7 +2,7 @@
 
 ## Prepare a real-money launch
 
-The default **Launch setup** workspace collects a draft across token/fee routing, investing entity and holder rights, first purchase, and custody/payout operations. No launch-specific details are prefilled. The user has not yet chosen the token, fee wallet, buying entity, or provider structure.
+The default **Launch setup** workspace collects a draft across token/fee routing, investing entity and holder rights, first purchase, and custody/payout operations. Robinhood Chain mainnet (4663) and pons are the selected launch route. New drafts prefill the network; token address, fee wallet, buying entity and holder structure remain undecided.
 
 - Drafts save only in this browser's local storage. They are not shared with the Site owner or other devices. Download a JSON draft to back up or transfer it; validated imports preview the replacement before it is applied.
 - USD purchase budgeting uses exact integer cents, distinguishes purchase fees and retained reserves, and reports the funding gap against operator-reported settled cash.
@@ -17,7 +17,7 @@ Mainstreet is a wallet-connected testnet application with a real-company researc
 
 ## Run the pilot
 
-1. Open the published site and connect MetaMask (an extension or its mobile browser).
+1. Open the published site and connect MetaMask using its extension, mobile QR pairing, or mobile browser. The official MetaMask Connect module loads only when needed, with analytics disabled.
 2. Select Robinhood Chain Testnet, chain ID `46630`, or Ethereum Sepolia, `11155111`.
 3. Obtain test ETH through the selected network's documentation/faucet resources. Click **Deploy test treasury**. The wallet signs one deployment creating the treasury, mUSD test token, and immutable-allocation distribution contract. The signing wallet is the administrator and original test settlement recipient.
 4. Use **Get test dollars** for 10,000 valueless mUSD (once per wallet per day). **Deposit test fees** performs an exact-amount token approval followed by a deposit.
@@ -44,11 +44,15 @@ Mainstreet is a wallet-connected testnet application with a real-company researc
 
 For a real pilot, choose a specific offering and approved buyer, review terms and budget, complete provider checkout, reconcile the finalized holding, and then build/approve the production custody and distribution integration. The test contracts cannot be switched to accept real money.
 
-## Pons research
+## Pons V2 and holder experience
 
-Checked September 13, 2026: [Pons documentation](https://docs.ponsfamily.com/#fees) describes creator fees in both the launch token and WETH, with a current 70% creator / 30% protocol split snapshotted at launch (legacy launches have a different split). Claims accrue in the locked position and route to the creator payout wallet. There is no Mainstreet launch token or fee wallet configured. Dollar investments therefore also require actual collection, conversion/offramp and reconciliation. Test mUSD deposits do not represent that integration.
+The launch page can read the published Pons V2 factory on Robinhood Chain mainnet. It checks the network, the connected wallet's canLaunch status, token registration and reverse contract references, current fee recipient, quote asset, fee policy and recipient escrow balance at a consistent block. Unknown versions and failed reads remain unverified. No transaction or fee collection is performed. Pons V2 documentation describes restricted launch access; the connected wallet's current permission must be read on-chain.
 
-Network settings were cross-checked against [ethereum-lists chain data](https://chainid.network/chains.json). Public testnet RPC requests from the development environment timed out or returned access errors, and no funded user wallet was available. Browser deployment is implemented; no public deployment address is asserted in the configuration.
+Escrow balances aggregate all launches using that recipient and are labeled accordingly. A curve-stage unswept estimate is separate from settled escrow; pool-stage pending fees are not indexed. No Mainstreet token was supplied, so its identity and fee flow remain unverified. The browser network check succeeded at block 61,836,622 during validation. Sources: [Pons V2 docs](https://docs.ponsfamily.com/v2), [verified source](https://github.com/ponsdotdev/ponsfamily/tree/e9dfc58128e8534d2e9d4d65be18f1dea32c404f), and the [factory explorer](https://robinhoodchain.blockscout.com/address/0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e).
+
+My portfolio offers a clearly labeled interactive holder example with 60/40 allocations and simulated claims. Connected test wallets show actual test-contract records, claim receipts when present in the loaded history, and a downloadable holder statement. Current participation-based cost allocation remains distinct from frozen historic payouts and from real company ownership.
+
+The directory contains 19 real businesses with dated source notes, separate security types, and honestly labeled photographs, company graphics and renderings. Animoca's Republic/INX beneficial shares are on Solana, not Robinhood Chain. Original image provenance for new assets is in dist/asset-sources.json. The Mainstreet identity is monochrome; the MetaMask fox is the unmodified official asset.
 
 ## Development and checks
 

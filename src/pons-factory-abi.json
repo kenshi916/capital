@@ -1,0 +1,231 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "launcher",
+        "type": "address"
+      }
+    ],
+    "name": "canLaunch",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeEscrow",
+    "outputs": [
+      {
+        "internalType": "contract IPonsV2FeeEscrow",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "getLaunchFeePolicy",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "protocolFeeRecipient",
+            "type": "address"
+          },
+          {
+            "internalType": "uint16",
+            "name": "protocolFeeShareBps",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "buybackBurnBps",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "hookFeeBps",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "maxInternalPriceImpactBps",
+            "type": "uint16"
+          }
+        ],
+        "internalType": "struct FeePolicySnapshot",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "getLaunchedToken",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "curve",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "deployer",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "creatorFeeRecipient",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "pairToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "graduationThreshold",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint24",
+            "name": "poolFee",
+            "type": "uint24"
+          },
+          {
+            "internalType": "int24",
+            "name": "tickSpacing",
+            "type": "int24"
+          },
+          {
+            "internalType": "uint16",
+            "name": "creatorTaxBps",
+            "type": "uint16"
+          },
+          {
+            "internalType": "bool",
+            "name": "buybackEnabled",
+            "type": "bool"
+          },
+          {
+            "internalType": "enum GraduationPhase",
+            "name": "phase",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sweptQuote",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sweptTokens",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sweptAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "exists",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct IPonsV2LaunchFactory.LaunchedToken",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "launchEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "memeHook",
+    "outputs": [
+      {
+        "internalType": "contract PonsV2MemeHook",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "pendingCreatorFeeRecipient",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "newRecipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "effectiveAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "expiresAt",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

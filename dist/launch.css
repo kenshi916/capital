@@ -1,6 +1,6 @@
 /* Extend Mainstreet's existing orange accent and editorial type for an operational workspace. */
 [hidden]{display:none!important}
-body[data-view="launch"] .chain-toolbar,body[data-view="launch"] .prototype-notice,body[data-view="launch"] #wallet-button{display:none}
+body[data-view="launch"] .chain-toolbar,body[data-view="launch"] .prototype-notice{display:none}
 .launch-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;padding:36px 0 28px}
 .launch-heading .eyebrow{font-size:.75rem;color:#7a5b46;letter-spacing:.08em;margin-bottom:18px}
 .launch-heading h1{font-size:clamp(2.25rem,3.5vw,3.5rem);line-height:1.08;letter-spacing:-.05em;font-weight:500}
