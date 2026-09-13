@@ -172,3 +172,47 @@ html[data-theme=dark] .launch-network-details .launch-route{background:transpare
 .treasury-admin-tools #chain-status{display:none}
 .treasury-admin-tools .chain-tools{display:flex;justify-content:space-between;gap:10px}
 .treasury-admin-tools .chain-tools .text-button{font-size:.8125rem}
+
+/* Spacious hero, capsule controls, and softly framed company imagery. */
+.site-header{height:72px;border-radius:24px;margin-top:22px}
+.site-header .main-nav .nav-item{border-radius:999px}
+.site-header .wallet-button{border-radius:999px;padding-left:18px;padding-right:18px}
+.site-header .theme-toggle{border-radius:50%}
+.home-intro{max-width:1040px;padding:52px 0 48px}
+.home-eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;background:var(--surface);padding:8px 14px;font-size:.8125rem;letter-spacing:0;margin-bottom:26px;box-shadow:inset 0 1px 0 #ffffff22}
+.home-eyebrow:before{content:'';width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#718e20}
+.home-intro h1{font-size:clamp(3.25rem,6.2vw,5.125rem);font-weight:500;letter-spacing:-.06em;line-height:1.04}
+.home-title-accent{color:#435818}
+.home-intro>p{font-size:1.0625rem;line-height:1.7;max-width:600px;margin-top:24px}
+.home-actions{gap:12px;margin-top:30px}
+.home-actions .button{border-radius:999px;min-height:56px;gap:24px;padding:7px 8px 7px 23px;font-size:.9375rem;font-weight:500;transition:box-shadow .2s,background .2s}
+.home-actions .button>span{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border-radius:50%;background:#fff;color:#111;font-size:1.25rem;transition:transform .2s}
+.home-actions .button:hover>span{transform:rotate(45deg)}
+.home-portfolio-link{border:1px solid var(--border);border-radius:999px;min-height:56px;padding:0 23px;gap:20px;font-size:.9375rem;font-weight:500;background:var(--surface);transition:border-color .2s,background .2s}
+.home-portfolio-link:hover{text-decoration:none;border-color:#777;background:#8888880a}
+.company-universe{margin-top:12px;padding-top:28px;border-top:1px solid var(--border)}
+.universe-heading{font-size:.875rem;padding-bottom:21px}
+.universe-count{border-radius:999px;padding:4px 7px;min-width:25px;text-align:center;margin-left:8px}
+.motion-control{border-radius:999px;padding:10px 14px;font-size:.75rem;min-height:38px}
+.company-wall{gap:15px}
+.company-track-set{gap:15px;padding-right:15px}
+.home-company{width:228px;flex-basis:228px;height:158px;border-radius:18px;padding:5px;background:var(--surface);border:1px solid var(--border);box-shadow:inset 0 1px 0 #ffffff10}
+.home-company img{border-radius:13px}
+.home-company:after{inset:5px;border-radius:13px;background:linear-gradient(transparent 30%,#000c 100%)}
+.home-company-name{left:18px;right:18px;bottom:16px;font-size:.8125rem}
+.home-company-name>span{display:grid;place-items:center;width:23px;height:23px;flex:0 0 23px;border-radius:50%;border:1px solid #ffffff55;opacity:1;background:#ffffff12;backdrop-filter:blur(8px)}
+.home-company:hover{border-color:#8e9e62}
+.home-disclosure{margin-top:25px;font-size:.75rem}
+.business-strip.opportunity-card{border-radius:18px;box-shadow:inset 0 1px 0 #ffffff08}
+html[data-theme=dark] .site-header{background:#111111b8;border-color:#ffffff20;box-shadow:inset 0 1px 0 #ffffff0c,0 12px 36px #0005}
+html[data-theme=dark] .home-eyebrow{background:#ffffff06;border-color:#ffffff24;color:#b7bbb2}
+html[data-theme=dark] .home-eyebrow:before{background:#d4fc50}
+html[data-theme=dark] .home-title-accent{color:#d4fc50}
+html[data-theme=dark] .home-actions .button>span{background:#14170b;color:#d4fc50}
+html[data-theme=dark] .home-portfolio-link{background:#ffffff05;border-color:#ffffff24;color:#eee}
+html[data-theme=dark] .home-portfolio-link:hover{background:#ffffff0c;border-color:#ffffff45}
+html[data-theme=dark] .home-company{background:#0d0d0d;border-color:#ffffff1f}
+html[data-theme=dark] .home-company:hover{border-color:#d4fc5080}
+@media(max-width:800px){.site-header{height:auto;margin-top:10px;border-radius:20px}.site-header .wallet-button{padding-left:12px;padding-right:12px}.home-intro{padding:30px 0 35px}.home-intro h1{font-size:3.75rem}.home-eyebrow{font-size:.75rem;padding:8px 12px;margin-bottom:22px}.home-intro>p{font-size:1rem;max-width:410px;margin-top:20px}.home-actions{margin-top:25px;gap:10px}.home-actions .button{min-height:50px;font-size:.875rem;gap:16px;padding-left:18px}.home-actions .button>span{width:34px;height:34px;flex-basis:34px}.home-portfolio-link{min-height:50px;font-size:.875rem;padding:0 18px;gap:12px}.company-universe{padding-top:23px;margin-top:8px}.company-wall{gap:11px}.company-track-set{gap:11px;padding-right:11px}.home-company{width:190px;flex-basis:190px;height:140px}.universe-heading{font-size:.8125rem;padding-bottom:17px}.home-company-name{font-size:.75rem;left:16px;right:16px;bottom:14px}}
+@media(max-width:440px){.home-intro{padding:22px 0 30px}.home-intro h1{font-size:2.75rem;line-height:1.06}.home-eyebrow{font-size:.6875rem;margin-bottom:22px}.home-intro>p{font-size:.9375rem;max-width:290px;margin-top:18px}.home-actions{gap:8px;margin-top:23px}.home-actions .button{font-size:.8125rem;min-height:48px;padding-left:15px;padding-right:6px;gap:10px}.home-actions .button>span{width:32px;height:32px;flex-basis:32px;font-size:1.125rem}.home-portfolio-link{font-size:.8125rem;min-height:48px;padding:0 14px;gap:10px}.home-company{width:166px;flex-basis:166px;height:124px;border-radius:16px;padding:4px}.home-company img,.home-company:after{border-radius:12px}.home-company:after{inset:4px}.home-company-name{left:13px;right:13px;bottom:12px}.home-company-name>span{width:19px;height:19px;flex-basis:19px}.universe-heading{font-size:.75rem;gap:8px}.motion-control{padding:8px 10px;font-size:.6875rem}.universe-count{margin-left:4px;padding:3px 5px}.home-disclosure{max-width:310px;font-size:.6875rem}}
+@media(prefers-reduced-motion:reduce){.home-actions .button,.home-actions .button>span,.home-portfolio-link{transition:none}.home-actions .button:hover>span{transform:none}}
