@@ -1,4 +1,17 @@
-# Mainstreet testnet treasury
+# Mainstreet launch preparation and test treasury
+
+## Prepare a real-money launch
+
+The default **Launch setup** workspace collects a draft across token/fee routing, investing entity and holder rights, first purchase, and custody/payout operations. No launch-specific details are prefilled. The user has not yet chosen the token, fee wallet, buying entity, or provider structure.
+
+- Drafts save only in this browser's local storage. They are not shared with the Site owner or other devices. Download a JSON draft to back up or transfer it; validated imports preview the replacement before it is applied.
+- USD purchase budgeting uses exact integer cents, distinguishes purchase fees and retained reserves, and reports the funding gap against operator-reported settled cash.
+- Business profiles can populate a purchase draft without overwriting existing operator edits. Terms still require confirmation at the provider.
+- Review & evidence records SHA-256 document fingerprints locally (up to 30 references, 10 MB per file). Original documents are neither uploaded nor included in exports. Fingerprints do not authenticate the documents or establish ownership.
+- A readable Markdown review packet includes all plan fields, missing details, the budget, evidence fingerprints and remaining production dependencies. Reported approvals remain unverified.
+- No field or imported file can enable live operations. Real Pons collection, order submission, production custody and real payouts are not implemented or connected. Production requires a separately reviewed design and integration; the existing test contracts cannot be converted by changing a network setting.
+
+The original testnet treasury, directory and wallet claim flows remain available under **Test treasury**, **Businesses**, and **My portfolio**. Treasury links continue to open their testnet context.
 
 Mainstreet is a wallet-connected testnet application with a real-company research directory. It does not hold real company shares, issue equity rights, collect live Pons fees, or send orders to Republic/Wefunder.
 

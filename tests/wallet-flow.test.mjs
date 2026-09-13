@@ -29,6 +29,7 @@ test('published UI completes wallet deployment, fee deposit, purchase, payment, 
   const w = dom.window, errors = [];
   const accounts = await engine.request({method:'eth_accounts',params:[]});
   let activeAccount = accounts[0];
+  let switchOnLogs = false, sentTransactions = 0;
   const listeners = new Map();
   try {
     w.addEventListener('error', e => errors.push(e.error || e.message));
@@ -46,7 +47,14 @@ test('published UI completes wallet deployment, fee deposit, purchase, payment, 
     };
     w.ethereum = {
       isMetaMask: true,
-      request: args => ['eth_requestAccounts','eth_accounts'].includes(args.method) ? Promise.resolve([activeAccount]) : engine.request(args),
+      request: async args => {
+        if (args.method === 'eth_sendTransaction') sentTransactions++;
+        if (args.method === 'eth_getLogs' && switchOnLogs) {
+          switchOnLogs = false; activeAccount = accounts[0]; listeners.get('accountsChanged')([activeAccount]);
+          await waitFor(()=>w.document.querySelector('#chain-treasury-address').textContent.includes('Administrator'), 'Changed wallet refresh did not finish');
+        }
+        return ['eth_requestAccounts','eth_accounts'].includes(args.method) ? [activeAccount] : engine.request(args);
+      },
       on(name, listener) { listeners.set(name, listener); }, removeListener(name) { listeners.delete(name); }
     };
     w.eval(read('dist/opportunities.js') + '\n' + read('dist/app.js')); w.eval(read('dist/chain.js'));
@@ -108,6 +116,11 @@ test('published UI completes wallet deployment, fee deposit, purchase, payment, 
     assert.equal(w.document.querySelector('#holder-assets').textContent,'400.00');
     assert.equal(w.document.querySelector('#chain-holder-claimable').textContent,'0.00');
     assert.equal(w.document.querySelectorAll('[data-chain-claim]').length,0,'A completed claim must not be offered again');
+    const beforeSwitch = sentTransactions;
+    switchOnLogs = true;
+    w.document.querySelector('#chain-mint').click();
+    await waitFor(()=>w.document.querySelector('#toast').textContent.includes('Wallet or network changed'), 'Changing wallets during the refresh must cancel the pending action');
+    assert.equal(sentTransactions,beforeSwitch,'A stale signer must never reach eth_sendTransaction');
     assert.deepEqual(errors, []);
   } finally { dom.window.close(); await engine.disconnect(); }
 });

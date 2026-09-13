@@ -3,17 +3,19 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#fffdf8">
-  <meta name="description" content="Explore a transparent testnet treasury, real business funding profiles, and an wallet-connected testnet portfolio with Mainstreet.">
+  <meta name="description" content="Explore a transparent testnet treasury, real business funding profiles, and a wallet-connected testnet portfolio with Mainstreet.">
   <title>Mainstreet — Treasury & private markets</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='20' fill='%23f45b23'/%3E%3Cpath d='M10 28V16h5v12m3 0V10h5v18m3 0V19h5v9' fill='none' stroke='%23ffffff' stroke-width='3.5'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="/styles.css?v=testnet-7"><link rel="stylesheet" href="/editorial.css?v=testnet-7"><script src="/opportunities.js?v=testnet-7" defer></script><script src="/app.js?v=testnet-7" defer></script><script src="/chain.js?v=testnet-7" defer></script><link rel="stylesheet" href="/chain.css?v=testnet-7">
+  <link rel="stylesheet" href="/styles.css?v=launch-8"><link rel="stylesheet" href="/editorial.css?v=launch-8"><script src="/opportunities.js?v=launch-8" defer></script><script src="/app.js?v=launch-8" defer></script><script src="/chain.js?v=launch-8" defer></script><link rel="stylesheet" href="/chain.css?v=launch-8">
+  <link rel="stylesheet" href="/launch.css?v=launch-8"><script src="/launch.js?v=launch-8" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header"><div class="header-inner">
   <a class="wordmark" href="#treasury" aria-label="Mainstreet treasury"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="brand-name">Main<em>street</em></span></a>
   <nav class="main-nav" aria-label="Main navigation">
-    <a href="#treasury" class="nav-item active" data-view="treasury"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 9 9-5 9 5M5 10v8m7-8v8m7-8v8M3 20h18"/></svg>Treasury</a>
+    <a href="#launch" class="nav-item" data-view="launch">Launch setup</a>
+    <a href="#treasury" class="nav-item active" data-view="treasury"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 9 9-5 9 5M5 10v8m7-8v8m7-8v8M3 20h18"/></svg>Test treasury</a>
     <a href="#explore" class="nav-item" data-view="explore"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>Businesses</a>
     <a href="#holdings" class="nav-item" data-view="holdings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9h9A9 9 0 1 1 12 3Zm4 0v5h5a7 7 0 0 0-5-5Z"/></svg>My portfolio</a>
   </nav>
@@ -22,6 +24,7 @@
 <main id="main" class="main-shell">
   <div class="prototype-notice"><span class="notice-label">TESTNET</span><p>Test dollars have no monetary value. Investment records are simulations; no real company shares are issued.</p><button class="text-button" id="about-button">How it works <span aria-hidden="true">↗</span></button></div>
   <div class="chain-toolbar"><div class="chain-network"><label for="chain-network">Network</label><select id="chain-network"><option value="46630">Robinhood Chain Testnet</option><option value="11155111">Ethereum Sepolia</option></select><span class="chain-status" id="chain-status">No treasury selected</span></div><div class="chain-tools"><button class="text-button" id="chain-share" disabled>Share treasury ↗</button><button class="icon-button" id="chain-refresh" aria-label="Refresh onchain balances">↻</button></div></div>
+  <section id="view-launch" class="view" aria-label="Launch preparation" hidden></section>
   <section id="view-treasury" class="view" aria-labelledby="treasury-title">
     <div class="workspace-heading"><div><p class="eyebrow">THE MAINSTREET TREASURY</p><h1 id="treasury-title">A treasury for<br><em>the real economy.</em></h1><p>Explore real businesses and see how trading fees<br class="desktop-break"> could build a documented investment portfolio.</p></div><a class="button button-light" href="#explore">Explore businesses <span aria-hidden="true">↗</span></a></div>
     <section class="chain-setup surface" id="chain-setup"><div><p class="eyebrow">YOUR FIRST ONCHAIN TREASURY</p><h2>Start with a test treasury.</h2><p>Connect your wallet and deploy a treasury you control. Test transactions use test ETH; no real dollars or shares are involved.</p><div class="chain-button-row"><button class="button button-dark" id="chain-deploy">Deploy test treasury</button><a class="button button-light" id="chain-faucet-link" href="https://docs.robinhood.com/chain/" target="_blank" rel="noopener noreferrer">Get test ETH ↗</a></div></div><form id="chain-attach-form" class="chain-form"><label>Open an existing test treasury<input id="chain-address-input" placeholder="0x… contract address" required pattern="0x[a-fA-F0-9]{40}" autocomplete="off"></label><button class="button button-light" type="submit">Open treasury</button><small>Shareable records live on the selected test network. Only its administrator can manage a treasury.</small></form></section>

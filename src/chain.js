@@ -163,15 +163,19 @@ async function transact(label, task, owner = false) {
   let lastConfirmed = null;
   try {
     state.busy = true; updateControls();
+    const initial = { account: state.account, injected: state.injected, chain: state.chain };
     const signer = await checkedSigner(owner);
-    if (state.address) { await refresh(); if (!state.data) throw new Error('Refresh the treasury before submitting a transaction.'); }
-    entered = true; updateControls();
-    const session = { generation: state.generation, account: state.account, chain: state.chain };
+    const signerAddress = await signer.getAddress();
+    if (initial.account !== state.account || initial.injected !== state.injected || initial.chain !== state.chain || signerAddress.toLowerCase() !== state.account?.toLowerCase()) throw new Error('Wallet or network changed. Refresh and review the action again.');
+    const session = { generation: state.generation, account: state.account, chain: state.chain, injected: state.injected, treasury: state.address };
     const guard = async () => {
-      const accounts = await state.injected.request({ method: 'eth_accounts' });
-      const id = Number(await state.injected.request({ method: 'eth_chainId' }));
-      if (session.generation !== state.generation || accounts[0]?.toLowerCase() !== session.account.toLowerCase() || id !== session.chain) throw new Error('Wallet or network changed. Refresh and review the action again.');
+      const accounts = await session.injected.request({ method: 'eth_accounts' });
+      const id = Number(await session.injected.request({ method: 'eth_chainId' }));
+      if (session.generation !== state.generation || session.injected !== state.injected || session.account !== state.account || session.chain !== state.chain || session.treasury !== state.address || accounts[0]?.toLowerCase() !== signerAddress.toLowerCase() || id !== session.chain || (await signer.getAddress()).toLowerCase() !== signerAddress.toLowerCase()) throw new Error('Wallet or network changed. Refresh and review the action again.');
     };
+    if (state.address) { await refresh(); if (!state.data) throw new Error('Refresh the treasury before submitting a transaction.'); }
+    await guard();
+    entered = true; updateControls();
     const send = async (description, action) => {
       await guard(); txStatus(`${description} — review in your wallet`);
       const tx = await action(); txStatus(`${description} — waiting for confirmation`, tx.hash);
@@ -244,6 +248,7 @@ async function refresh() {
   if (!sameContract(assetCode, state.artifacts.MainstreetTestDollar) || !sameContract(distributionCode, state.artifacts.MainstreetDistributions)) throw new Error('The treasury’s token or distribution contract could not be verified.');
   const dist = new Contract(d.distributions, state.artifacts.MainstreetDistributions.abi, provider);
   if ((await dist.treasury(at)).toLowerCase() !== treasuryAddress.toLowerCase()) throw new Error('Distribution contract belongs to another treasury.');
+  if ((await dist.asset(at)).toLowerCase() !== d.asset.toLowerCase()) throw new Error('Distribution contract uses a different asset. No token approvals are enabled.');
   const token = new Contract(d.asset, state.artifacts.MainstreetTestDollar.abi, provider);
   d.investments = await mapBatches(Array.from({ length: Number(d.investmentCount) }, (_, id) => id), async id => ({ id, value: await t.getInvestment(id, at) }));
   d.members = await mapBatches(Array.from({ length: Number(d.memberCount) }, (_, i) => i), async i => { const a = await t.memberAt(i, at); return { address: a, units: await t.eligibleUnits(a, at) }; });
@@ -494,7 +499,7 @@ function bindActions() {
   });
 }
 async function initialize() {
-  const [configResponse, artifactResponse] = await Promise.all([fetch('/deployment.json?v=testnet-7'), fetch('/contracts/artifacts.json?v=testnet-7')]);
+  const [configResponse, artifactResponse] = await Promise.all([fetch('/deployment.json?v=launch-8'), fetch('/contracts/artifacts.json?v=launch-8')]);
   if (!configResponse.ok || !artifactResponse.ok) throw new Error('The testnet application could not load its configuration. Refresh this page.');
   state.config = await configResponse.json(); state.artifacts = await artifactResponse.json();
   const url = new URL(location.href); let saved = null;
