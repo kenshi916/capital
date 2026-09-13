@@ -100,6 +100,8 @@ function toast(message){clearTimeout(toastTimer);$('#toast').textContent=message
 function useDemoAccount(){state.demoAccount=true;$('#wallet-empty').hidden=true;$('#holdings-content').hidden=false;$('#wallet-button span').textContent='Demo account';$('#disconnect-demo').hidden=false;$('#use-demo-account').textContent='View demo portfolio ↗';if($('#wallet-dialog').open)$('#wallet-dialog').close();navigate('holdings');return {demoAccount:true,samplePortfolioInterest:interest};}
 function endDemoAccount(){state.demoAccount=false;$('#wallet-empty').hidden=false;$('#holdings-content').hidden=true;$('#wallet-button span').textContent='Preview wallet';$('#disconnect-demo').hidden=true;$('#use-demo-account').textContent='Open demo portfolio ↗';$('#wallet-dialog').close();toast('Demo session ended.');}
 document.addEventListener('click',event=>{
+  if(event.target.closest('[data-about]')){$('#about-dialog').showModal();return;}
+  if(event.target.closest('[data-rights]')){$('#rights-dialog').showModal();return;}
   const watch=event.target.closest('[data-watch]');if(watch){toggleWatch(watch.dataset.watch);return;}
   const opportunity=event.target.closest('[data-opportunity]');if(opportunity){openOpportunity(opportunity.dataset.opportunity);return;}
   const company=event.target.closest('[data-company]');if(company){openHolding(company.dataset.company);return;}
