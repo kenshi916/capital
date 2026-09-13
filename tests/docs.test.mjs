@@ -13,7 +13,7 @@ test('docs deep links resolve to one readable chapter and keep the main navigati
   assert.equal(d.body.dataset.view,'docs');assert.equal(d.querySelector('.main-nav [aria-current="page"]').textContent,'Docs');
   assert.deepEqual([...d.querySelectorAll('[data-doc-page]')].filter(e=>!e.hidden).map(e=>e.dataset.docPage),[chapter]);
   assert.equal(d.querySelector('[data-doc-link][aria-current="page"]').dataset.docLink,chapter);
-  assert.equal(d.querySelectorAll('.main-nav a').length,5);dom.window.close();
+  assert.equal(d.querySelectorAll('.main-nav a').length,6);dom.window.close();
  }
 });
 test('chapter navigation, fallback, and the page skip link preserve the reading state',()=>{
