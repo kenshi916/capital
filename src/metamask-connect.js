@@ -2,7 +2,7 @@ import { createEVMClient } from '@metamask/connect-evm';
 let client;
 export async function connectMetaMask(chainId) {
   client ||= await createEVMClient({
-    dapp: { name: 'Mainstreet', url: location.origin, iconUrl: new URL('/favicon.svg', location.origin).href },
+    dapp: { name: 'Capital', url: location.origin, iconUrl: new URL('/favicon.svg?v=capital-17', location.origin).href },
     api: { supportedNetworks: {
       '0x1237': 'https://rpc.mainnet.chain.robinhood.com',
       '0xb626': 'https://rpc.testnet.chain.robinhood.com',
