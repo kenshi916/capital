@@ -1,4 +1,7 @@
 import {sqliteTable,text,integer,uniqueIndex,index} from 'drizzle-orm/sqlite-core';
+export const messages=sqliteTable('capital_messages',{
+ id:integer('id').primaryKey({autoIncrement:true}),userId:text('user_id').notNull(),requestId:text('request_id').notNull(),body:text('body').notNull(),parentId:integer('parent_id'),createdAt:integer('created_at').notNull(),hiddenAt:integer('hidden_at'),hiddenBy:text('hidden_by')
+},t=>[uniqueIndex('idx_capital_message_request').on(t.userId,t.requestId),index('idx_capital_message_user_time').on(t.userId,t.createdAt)]);
 export const admins=sqliteTable('capital_admins',{slot:text('slot').primaryKey(),userId:text('user_id').notNull(),createdAt:integer('created_at').notNull()});
 export const rounds=sqliteTable('capital_rounds',{
  id:text('id').primaryKey(),parentId:text('parent_id'),revision:integer('revision').notNull(),version:integer('version').notNull(),status:text('status').notNull(),mutationId:text('mutation_id').notNull(),payload:text('payload').notNull(),opensAt:integer('opens_at').notNull(),closesAt:integer('closes_at').notNull(),proposalHash:text('proposal_hash'),snapshotNumber:integer('snapshot_number'),snapshotHash:text('snapshot_hash'),snapshotTime:integer('snapshot_time'),finalResults:text('final_results'),createdAt:integer('created_at').notNull(),updatedAt:integer('updated_at').notNull()

@@ -2,6 +2,7 @@ import {verifyTypedData} from 'ethers';
 import {AppError,requireValue,now,hash,normalizeRound,checkPublication,statusOf,voteTypedData,tally,canonicalWallet,NETWORKS} from './voting-model.js';
 import * as chain from './snapshot.js';
 import companies from './companies.json';
+import {forum} from './forum.js';
 const uid=()=>crypto.randomUUID();
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}});
 const statement=(db,sql,...args)=>db.prepare(sql).bind(...args);
@@ -41,15 +42,17 @@ export function createApp(dependencies={}){
  }
  return {async fetch(request,env,ctx){
   const path=new URL(request.url).pathname;
-  if(!path.startsWith('/api/voting/')){if(env.ASSETS)return env.ASSETS.fetch(request);return new Response('Not found',{status:404});}
+  const isForum=path.startsWith('/api/forum/');
+  if(!isForum&&!path.startsWith('/api/voting/')){if(env.ASSETS)return env.ASSETS.fetch(request);return new Response('Not found',{status:404});}
   try{
-   requireValue(env.DB,'Shared voting storage is unavailable. Try again shortly.',503);
+   requireValue(env.DB,isForum?'Community messages are unavailable. Try again shortly.':'Shared voting storage is unavailable. Try again shortly.',503);
    const db=env.DB,auth=await identity(request,env,db),method=request.method;
    if(method!=='GET'){
     requireValue(['POST','PUT'].includes(method),'Method not allowed.',405);
     requireValue(request.headers.get('origin')===(env.CAPITAL_SITE_ORIGIN||new URL(request.url).origin),'This request must come from Capital.',403);
     requireValue(auth.user,'Sign in to Capital to continue.',401);
    }
+   if(isForum)return await forum(request,db,auth,env,readBody);
    if(path==='/api/voting/session'&&method==='GET')return json({signedIn:!!auth.user,isAdmin:auth.admin,adminConfigured:auth.adminConfigured,networks:NETWORKS,serverTime:now(),preview:!!env.CAPITAL_PREVIEW});
    if(path==='/api/voting/rounds'&&method==='GET'){
     const rows=await all(db,auth.admin?'SELECT * FROM capital_rounds ORDER BY created_at DESC':"SELECT * FROM capital_rounds WHERE status NOT IN ('draft','archived') ORDER BY created_at DESC");
@@ -121,7 +124,7 @@ export function createApp(dependencies={}){
     }
    }
    throw new AppError('Voting endpoint not found.',404);
-  }catch(error){if(!(error instanceof AppError))console.error('Voting request failed',path,error?.message);return json({error:error instanceof AppError?error.message:'Shared voting is temporarily unavailable. Your unsubmitted input has been kept.'},error.status||503);}
+  }catch(error){if(!(error instanceof AppError))console.error(isForum?'Forum request failed':'Voting request failed',path,error?.message);return json({error:error instanceof AppError?error.message:isForum?'Community messages are temporarily unavailable. Your draft has been kept.':'Shared voting is temporarily unavailable. Your unsubmitted input has been kept.'},error.status||503);}
  }};
 }
 export default createApp();
