@@ -4,3 +4,8 @@ artifacts/
 *.log
 .sites-runtime/
 .DS_Store
+
+dist/client/
+dist/server/
+dist/.openai/
+.local-voting/

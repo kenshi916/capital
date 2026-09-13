@@ -568,3 +568,22 @@ async function initialize() {
 }
 bindWalletActions(); registerProviders(); updateWallet();
 initialize().catch(error => { status('Setup needs attention', true); text('#chain-updated', errorMessage(error)); notify(errorMessage(error), true); $('#chain-deploy').disabled = true; });
+window.CapitalWallet=Object.freeze({
+ getAccount:()=>state.account,
+ async signBallot(typed){
+  if(!state.injected||!state.account)throw new Error('Connect your wallet first.');
+  if(typed.domain?.name!=='Capital community voting'||![4663,46630,11155111].includes(Number(typed.domain.chainId))||typed.message?.wallet?.toLowerCase()!==state.account.toLowerCase())throw new Error('This ballot does not match the connected wallet.');
+  const account=state.account,provider=state.injected,chainId='0x'+Number(typed.domain.chainId).toString(16);
+  if(Number(await provider.request({method:'eth_chainId'}))!==Number(typed.domain.chainId)){
+   try{await provider.request({method:'wallet_switchEthereumChain',params:[{chainId}]});}
+   catch(error){
+    if(error.code!==4902&&error.data?.originalError?.code!==4902)throw error;
+    const networks={4663:['Robinhood Chain','https://rpc.mainnet.chain.robinhood.com','https://robinhoodchain.blockscout.com'],46630:['Robinhood Chain Testnet','https://rpc.testnet.chain.robinhood.com','https://explorer.testnet.chain.robinhood.com'],11155111:['Ethereum Sepolia','https://ethereum-sepolia-rpc.publicnode.com','https://sepolia.etherscan.io']},n=networks[typed.domain.chainId];
+    await provider.request({method:'wallet_addEthereumChain',params:[{chainId,chainName:n[0],nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},rpcUrls:[n[1]],blockExplorerUrls:[n[2]]}]});
+    await provider.request({method:'wallet_switchEthereumChain',params:[{chainId}]});
+   }
+  }
+  const accounts=await provider.request({method:'eth_accounts'});if(!accounts.some(a=>a.toLowerCase()===account.toLowerCase())||state.account!==account)throw new Error('The connected wallet changed. Start the vote again.');
+  return new BrowserProvider(provider,'any').getSigner(account).then(signer=>signer.signTypedData(typed.domain,typed.types,typed.message));
+ }
+});
