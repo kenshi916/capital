@@ -1,0 +1,77 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ganache from 'ganache';
+import { BrowserProvider, ContractFactory, Contract, id, parseUnits } from 'ethers';
+const artifacts = JSON.parse(fs.readFileSync('dist/contracts/artifacts.json'));
+const usd = value => parseUnits(String(value), 6);
+test('fees → recorded purchase → cash return → frozen 60/40 distribution → two claims', async () => {
+  const engine = ganache.provider({ chain: { chainId: 31337 }, logging: { quiet: true }, wallet: { totalAccounts: 4 } });
+  try {
+    const provider = new BrowserProvider(engine);
+    provider.pollingInterval = 10;
+    const owner = await provider.getSigner(0), alice = await provider.getSigner(1), bob = await provider.getSigner(2), stranger = await provider.getSigner(3);
+    const treasury = await new ContractFactory(artifacts.MainstreetTreasury.abi, artifacts.MainstreetTreasury.bytecode, owner).deploy();
+    await treasury.waitForDeployment();
+    const dollar = new Contract(await treasury.asset(), artifacts.MainstreetTestDollar.abi, owner);
+    const distribution = new Contract(await treasury.distributions(), artifacts.MainstreetDistributions.abi, owner);
+    const mine = async promise => (await promise).wait();
+    const rejects = async action => assert.rejects(async () => { const tx = await action(); if (tx?.wait) await tx.wait(); });
+    await mine(dollar.faucet());
+    await rejects(() => dollar.faucet());
+    await mine(dollar.approve(treasury.target, usd(5000)));
+    await mine(treasury.depositFees(usd(5000)));
+    assert.equal(await treasury.cash(), usd(5000));
+    assert.equal(await treasury.totalFees(), usd(5000));
+    await rejects(() => treasury.connect(stranger).prepareInvestment('Fake', 'Equity', 'https://example.com', 1));
+    await mine(treasury.prepareInvestment('Miso Robotics — TEST ONLY', 'Simulated common stock', 'https://republic.com/miso-robotics', usd(2000)));
+    assert.equal(await treasury.availableCash(), usd(3000));
+    await rejects(() => treasury.prepareInvestment('Too much', 'Equity', 'https://example.com', usd(4000)));
+    await mine(treasury.recordInvestment(0, id('test agreement'), id('purchase receipt 1'), ''));
+    assert.equal(await treasury.cash(), usd(3000));
+    assert.equal(await treasury.outstandingCost(), usd(2000));
+    await rejects(() => treasury.recordInvestment(0, id('test agreement'), id('purchase receipt 1'), ''));
+    await mine(treasury.prepareInvestment('Cancelled test', 'Debt', 'https://example.com', usd(100)));
+    await mine(treasury.cancelInvestment(1));
+    assert.equal(await treasury.reservedForOrders(), 0n);
+    await rejects(() => treasury.fundDistribution(usd(1000), 'Cannot distribute fees as investment income'));
+    await mine(dollar.approve(treasury.target, usd(1500)));
+    await mine(treasury.recordPayment(0, usd(300), usd(1200), id('payment 1')));
+    assert.equal(await treasury.outstandingCost(), usd(1700));
+    assert.equal(await treasury.undistributedIncome(), usd(1200));
+    await rejects(() => treasury.recordPayment(0, 0, 1, id('payment 1')));
+    await rejects(() => treasury.recordPayment(0, usd(2000), 0, id('excess principal')));
+    await mine(treasury.setUnits(await alice.getAddress(), 60));
+    await mine(treasury.setUnits(await bob.getAddress(), 40));
+    await rejects(() => treasury.connect(stranger).setUnits(owner.address, 100));
+    await mine(treasury.setCashReserve(usd(3600)));
+    await rejects(() => treasury.fundDistribution(usd(1000), 'Reserve is protected'));
+    await mine(treasury.setCashReserve(usd(200)));
+    await mine(treasury.fundDistribution(usd(1000), 'Test business payment, after cash reserve'));
+    assert.equal(await distribution.allocation(0, alice.address), usd(600));
+    assert.equal(await distribution.allocation(0, bob.address), usd(400));
+    assert.equal(await dollar.balanceOf(distribution.target), usd(1000));
+    await mine(treasury.setUnits(alice.address, 0));
+    await mine(treasury.setUnits(bob.address, 100));
+    assert.equal(await distribution.allocation(0, alice.address), usd(600), 'Later balance changes must not change a snapshot');
+    await rejects(() => distribution.connect(stranger).claim(0));
+    await rejects(() => distribution.fund([owner.address], [1], 'Unauthorized epoch'));
+    await mine(distribution.connect(alice).claim(0));
+    await rejects(() => distribution.connect(alice).claim(0));
+    await mine(distribution.connect(bob).claim(0));
+    assert.equal(await dollar.balanceOf(alice.address), usd(600));
+    assert.equal(await dollar.balanceOf(bob.address), usd(400));
+    assert.equal((await distribution.getEpoch(0)).claimed, usd(1000));
+    assert.equal(await dollar.balanceOf(distribution.target), 0n);
+    assert.equal(await treasury.undistributedIncome(), usd(200));
+    assert.equal(await treasury.cash(), usd(3500));
+  } finally { await engine.disconnect(); }
+});
+test('deployment rejects a production chain ID', async () => {
+  const engine = ganache.provider({ chain: { chainId: 4663 }, logging: { quiet: true } });
+  try {
+    const signer = await new BrowserProvider(engine).getSigner();
+    const factory = new ContractFactory(artifacts.MainstreetTreasury.abi, artifacts.MainstreetTreasury.bytecode, signer);
+    await assert.rejects(() => factory.deploy());
+  } finally { await engine.disconnect(); }
+});

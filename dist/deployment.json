@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "defaultChainId": 46630,
+  "treasury": null,
+  "networks": {
+    "46630": {
+      "name": "Robinhood Chain Testnet",
+      "rpcUrls": ["https://rpc.testnet.chain.robinhood.com/rpc", "https://robinhood-sepolia-rpc.publicnode.com"],
+      "explorer": "https://explorer.testnet.chain.robinhood.com",
+      "faucet": "https://docs.robinhood.com/chain/"
+    },
+    "11155111": {
+      "name": "Ethereum Sepolia",
+      "rpcUrls": ["https://ethereum-sepolia-rpc.publicnode.com"],
+      "explorer": "https://sepolia.etherscan.io",
+      "faucet": "https://ethereum.org/en/developers/docs/networks/#sepolia"
+    }
+  },
+  "pons": {
+    "chainId": 4663,
+    "status": "not_connected",
+    "source": "https://docs.ponsfamily.com/#fees",
+    "checkedAt": "2026-09-13",
+    "feeAssets": ["launch token", "WETH"],
+    "currentCreatorShare": "70% of pool fee revenue; token-specific split is fixed at launch",
+    "note": "No launch token, payout wallet, swap route, or live fee collection is configured. Test deposits are mUSD simulations."
+  }
+}
