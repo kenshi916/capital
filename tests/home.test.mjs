@@ -29,6 +29,8 @@ test('home is the default and skip links preserve an initialized route', () => {
 test('home gallery respects reduced motion and opens company profiles', () => {
   const dom=page('/',true); const w=dom.window; const q=s=>w.document.querySelector(s);
   assert.equal(q('#home-company-wall').dataset.paused,'true');
+  assert.equal(q('#view-home').dataset.motionPaused,'true');
+  assert.match(q('#home-features-motion').textContent,/Play animations/);
   assert.match(q('#home-motion').textContent,/Play animation/);
   const originals=[...w.document.querySelectorAll('.company-track-set:not([aria-hidden]) .home-company')];
   assert.equal(originals.length,19);
@@ -36,7 +38,14 @@ test('home gallery respects reduced motion and opens company profiles', () => {
   for(const e of w.document.querySelectorAll('.company-track-set[aria-hidden] button')) assert.equal(e.tabIndex,-1);
   originals[0].click(); assert.equal(q('#holding-dialog').open,true); assert.match(q('#holding-title').textContent,/Miso Robotics/);
   q('#home-motion').click(); assert.equal(q('#home-company-wall').dataset.paused,'false');
-  q('#home-motion').click(); assert.equal(q('#home-company-wall').dataset.paused,'true');
+  assert.equal(q('#home-features-motion').getAttribute('aria-pressed'),'false');
+  q('#home-features-motion').click(); assert.equal(q('#home-company-wall').dataset.paused,'true');
+  assert.equal(q('#view-home').dataset.motionPaused,'true');
+  assert.equal(q('#home-motion').getAttribute('aria-pressed'),'true');
+  assert.equal(w.document.querySelectorAll('.capital-feature').length,4);
+  assert.equal(w.document.querySelectorAll('.capital-steps li').length,3);
+  for(const link of w.document.querySelectorAll('.capital-feature a,.capital-steps a'))assert.ok(q('#view-'+link.hash.slice(1)),link.hash);
+  for(const link of w.document.querySelectorAll('.capital-platforms a')){assert.equal(link.protocol,'https:');assert.match(link.rel,/noopener/);}
   const menu=q('.sector-menu'); menu.open=true; q('[data-sector="robotics"]').click();
   assert.equal(menu.open,false); assert.equal(q('#sector-summary').textContent,'Robotics');
   const ids=[...w.document.querySelectorAll('[id]')].map(e=>e.id); assert.equal(new Set(ids).size,ids.length);
