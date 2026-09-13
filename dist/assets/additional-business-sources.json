@@ -1,0 +1,270 @@
+{
+  "asOf": "2026-09-13",
+  "companies": [
+    {
+      "id": "miso-robotics",
+      "name": "Miso Robotics",
+      "issuer": "Miso Robotics, Inc.",
+      "location": "Pasadena, California",
+      "category": "Robotics",
+      "tags": [
+        "Kitchen automation",
+        "Restaurant technology",
+        "Equity"
+      ],
+      "summary": "Miso builds Flippy, an AI-powered robotic fry station for commercial kitchens, alongside software that helps restaurant operators manage daily work.",
+      "whyItMatters": "Its products automate repetitive kitchen tasks and give restaurant teams more visibility into operations.",
+      "platform": "Republic / DealMaker",
+      "offeringUrl": "https://republic.com/miso-robotics",
+      "issuerOfferingUrl": "https://invest.misorobotics.com/",
+      "website": "https://www.misorobotics.com/",
+      "status": "issuer-advertised-open",
+      "statusLabel": "Issuer advertises an open round",
+      "statusEvidence": "Issuer page currently displays Invest Now and common-stock terms. July 20, 2026 SEC supplement confirms Republic as an additional platform for this Reg A offering. The Republic page itself returned 403 and was not directly verified.",
+      "instrument": "Common stock",
+      "exemption": "Regulation A",
+      "minimumInvestment": 1052.16,
+      "minimumCurrency": "USD",
+      "minimumNote": "192 shares, plus a 3.5% transaction fee; not an all-in total.",
+      "sharePrice": 5.48,
+      "deadline": null,
+      "deadlineLabel": "No fixed calendar deadline verified",
+      "deadlineNote": "SEC supplement: terminates when maximum is sold, three years from initial qualification, or earlier at issuer discretion. The plan states an intention to continue for one year following qualification; no exact closing date should be inferred.",
+      "useOfProceeds": "Intended net-proceeds allocation in the January 2026 offering circular: 45% payroll, 35% marketing, 10% product development, and 10% general administration. Management may change allocations.",
+      "evidence": [
+        {
+          "source": "https://www.sec.gov/Archives/edgar/data/1710670/000110465926085085/tm2620901d1_253g2.htm",
+          "quote": "The minimum investment in this offering ... is $1,052.16, or 192 shares of Common Stock plus a 3.5% Transaction Fee."
+        },
+        {
+          "source": "https://www.sec.gov/Archives/edgar/data/1710670/000110465926085085/tm2620901d1_253g2.htm",
+          "quote": "The Company has engaged OpenDeal Broker LLC ... to assist with processing of investments through its online investment platform at www.republic.com."
+        },
+        {
+          "source": "https://www.sec.gov/Archives/edgar/data/1710670/000110465926001520/tm262179d1_partiiandiii.htm",
+          "quote": "45% Payroll; 35% Marketing; 10% Product Development; 10% General Administrative."
+        }
+      ],
+      "documents": [
+        {
+          "label": "July 20, 2026 offering supplement",
+          "url": "https://www.sec.gov/Archives/edgar/data/1710670/000110465926085085/tm2620901d1_253g2.htm"
+        },
+        {
+          "label": "January 6, 2026 offering circular",
+          "url": "https://www.sec.gov/Archives/edgar/data/1710670/000110465926001520/tm262179d1_partiiandiii.htm"
+        }
+      ],
+      "images": [
+        {
+          "sourceUrl": "https://cdn.prod.website-files.com/634850c558ad82360cdcaffb/6961263af9a353d7e78ffc9c_c16b0d7e0dafe3026c3b217dbcb82357_Staff.webp",
+          "sourcePage": "https://invest.misorobotics.com/",
+          "alt": "Restaurant employees beside a Flippy robotic fry station.",
+          "kind": "photograph"
+        },
+        {
+          "sourceUrl": "https://cdn.prod.website-files.com/634850c558ad82360cdcaffb/69de76cccdaba367f2a38ca9_Flippy%202%20Cooking.webp",
+          "sourcePage": "https://invest.misorobotics.com/",
+          "alt": "Flippy robotic arm lifting a fryer basket.",
+          "kind": "photograph"
+        }
+      ],
+      "verifiedAt": "2026-09-13",
+      "verificationScope": "Public issuer pages and accessible offering documents; no authenticated transaction or investment was attempted."
+    },
+    {
+      "id": "atombeam",
+      "name": "Atombeam",
+      "issuer": "AtomBeam Technologies Inc.",
+      "location": null,
+      "category": "Technology",
+      "tags": [
+        "Data software",
+        "IoT",
+        "Equity"
+      ],
+      "summary": "Atombeam develops Neurpac, software designed to compact data from connected devices before transmission and storage.",
+      "whyItMatters": "The company aims to help organizations move more machine data across existing networks without changing hardware.",
+      "platform": "StartEngine",
+      "offeringUrl": "https://www.startengine.com/offering/atombeam",
+      "issuerOfferingUrl": "https://invest.atombeamtech.com/",
+      "website": "https://www.atombeamtech.com/",
+      "status": "issuer-advertised-open",
+      "statusLabel": "Live offering advertised",
+      "statusEvidence": "Issuer investment page says LIVE OFFERING and displays a September 17, 2026 closing date. StartEngine offers a GET EQUITY action. Availability was observed on September 13, 2026, not guaranteed thereafter.",
+      "instrument": "Common stock",
+      "exemption": "Regulation A+",
+      "minimumInvestment": 645,
+      "minimumCurrency": "USD",
+      "minimumNote": "43 shares, plus a 3.5% processing fee per offering circular.",
+      "sharePrice": 15,
+      "deadline": "2026-09-17T23:59:00-07:00",
+      "deadlineLabel": "September 17, 2026, 11:59 PM PDT",
+      "deadlineNote": "Date displayed on issuer investment page; subject to issuer changes.",
+      "useOfProceeds": "Software development for PCM, sales and marketing, general administration, capital expenditures, capitalized R&D, and working-capital reserves. Allocations depend on funds raised and may change at management discretion.",
+      "evidence": [
+        {
+          "source": "https://invest.atombeamtech.com/",
+          "quote": "LIVE OFFERING ... Sept 17, 2026 at 11:59 PM PDT ... $645.00 Min Investment ... Common Stock Shares Offered."
+        },
+        {
+          "source": "https://www.sec.gov/Archives/edgar/data/1838432/000110465926008451/tm2533165d4_253g2.htm",
+          "quote": "The minimum investment in this offering is 43 shares of Common Stock, or $645, plus the 3.5% processing fee discussed below."
+        }
+      ],
+      "documents": [
+        {
+          "label": "Offering circular",
+          "url": "https://www.sec.gov/Archives/edgar/data/1838432/000110465926008451/tm2533165d4_253g2.htm"
+        }
+      ],
+      "images": [
+        {
+          "sourceUrl": "https://cdn.prod.website-files.com/697109e07ac286202ec8c341/6972aa065a937654ac31bd00_team1.png",
+          "sourcePage": "https://invest.atombeamtech.com/",
+          "alt": "Portrait of Atombeam CEO Charles Yeomans.",
+          "kind": "photograph"
+        },
+        {
+          "sourceUrl": "https://d19j0qt0x55bap.cloudfront.net/production/startups/68dda86627012ee0696e0e34/images/startup_cover/desktop_1_-_traction_1_-_16_9__4_.jpg",
+          "sourcePage": "https://www.startengine.com/offering/atombeam",
+          "alt": "Atombeam offering banner with company partnership disclosure.",
+          "kind": "issuer promotional graphic"
+        }
+      ],
+      "imageNote": "The CEO portrait is factual. The alternative banner is a promotional graphic, not a company facility photograph. Do not use stock data-center imagery as if it depicts an Atombeam facility.",
+      "verifiedAt": "2026-09-13",
+      "verificationScope": "Public issuer pages and accessible offering documents; no authenticated transaction or investment was attempted."
+    },
+    {
+      "id": "greenfield-robotics",
+      "name": "Greenfield Robotics",
+      "issuer": "Greenfield Robotics Corporation",
+      "location": "Cheney, Kansas",
+      "category": "Robotics",
+      "tags": [
+        "Agricultural robotics",
+        "Autonomous weeding",
+        "Equity"
+      ],
+      "summary": "Greenfield builds BOTONY, autonomous agricultural robots that use computer vision and mechanical weed control between crop rows.",
+      "whyItMatters": "The company is developing a field-operations platform intended to reduce farms’ reliance on herbicides.",
+      "platform": "StartEngine",
+      "offeringUrl": "https://www.startengine.com/offering/greenfield-robotics",
+      "issuerOfferingUrl": "https://invest.greenfieldrobotics.com/",
+      "website": "https://www.greenfieldincorporated.com/",
+      "status": "issuer-advertised-open",
+      "statusLabel": "Issuer advertises an open round",
+      "statusEvidence": "Issuer page says REG A+ OPEN and INVEST NOW. The linked SEC document is explicitly a September 3, 2026 preliminary circular, so final qualification and portal availability have not been independently verified.",
+      "instrument": "Common stock",
+      "exemption": "Regulation A+",
+      "minimumInvestment": 500.94,
+      "minimumCurrency": "USD",
+      "minimumNote": "242 shares plus a 3.5% transaction fee; preliminary circular states an all-in total of $518.47. Minimum is advertised by the issuer; final terms need confirmation.",
+      "sharePrice": 2.07,
+      "deadline": "2027-09-10T23:59:00-07:00",
+      "deadlineLabel": "September 10, 2027, 11:59 PM PDT",
+      "deadlineNote": "Issuer page displayed deadline, not independently verified against a final qualified circular.",
+      "useOfProceeds": "Preliminary circular lists manufacturing and production, field operations and deployment, R&D, sales and marketing, general administration, debt retirement, and working capital. A portion of the offering is sales by existing stockholders; those proceeds do not go to the issuer.",
+      "evidence": [
+        {
+          "source": "https://invest.greenfieldrobotics.com/",
+          "quote": "REG A+ OPEN ... Min Investment $500.94 ... Shares Offered Common Stock ... Sep 10, 2027 at 11:59 PM PDT."
+        },
+        {
+          "source": "https://www.sec.gov/Archives/edgar/data/1760404/000110465926104951/tm2617498d6_partiiandiii.htm",
+          "quote": "PRELIMINARY OFFERING CIRCULAR DATED SEPTEMBER 3, 2026 ... minimum investment ... 242 shares ... $500.94, plus the 3.5% Transaction Fee, totaling $518.47."
+        },
+        {
+          "source": "https://www.sec.gov/Archives/edgar/data/1760404/000110465926104951/tm2617498d6_partiiandiii.htm",
+          "quote": "The Company will not receive the proceeds from the sale of shares by the selling stockholders."
+        }
+      ],
+      "documents": [
+        {
+          "label": "September 3, 2026 preliminary offering circular",
+          "url": "https://www.sec.gov/Archives/edgar/data/1760404/000110465926104951/tm2617498d6_partiiandiii.htm"
+        }
+      ],
+      "images": [
+        {
+          "sourceUrl": "https://custom-images.strikinglycdn.com/res/hrscywv4p/image/upload/c_limit,fl_lossy,h_1500,w_2000,f_auto,q_auto/21268611/542540_149450.png",
+          "sourcePage": "https://www.greenfieldincorporated.com/",
+          "alt": "Greenfield robot working between soybean rows, with issuer text overlay.",
+          "kind": "photograph with issuer text overlay"
+        },
+        {
+          "sourceUrl": "https://cdn.prod.website-files.com/6a5a550dd11de66ff7a1a815/6a5f7f177fb7c0f15ce7b6db_American%20Regeneration%20Panel%20(2)%201%20(1).png",
+          "sourcePage": "https://invest.greenfieldrobotics.com/",
+          "alt": "Greenfield Robotics event panel at American Regeneration.",
+          "kind": "event photograph with issuer text overlay"
+        }
+      ],
+      "imageNote": "Some investment-page illustrations are explicitly labeled AI-generated; those were not selected. The provided images are photographic company materials with text overlays.",
+      "verifiedAt": "2026-09-13",
+      "verificationScope": "Public issuer pages and accessible offering documents; no authenticated transaction or investment was attempted."
+    },
+    {
+      "id": "graze-robotics",
+      "name": "Graze Robotics",
+      "issuer": "Future Labs V, Inc.",
+      "location": null,
+      "category": "Robotics",
+      "tags": [
+        "Autonomous mowing",
+        "Electric equipment",
+        "Equity"
+      ],
+      "summary": "Graze developed autonomous electric commercial lawn mowers designed to reduce fuel use and the labor required for mowing.",
+      "whyItMatters": "Its offering illustrates how robotics can automate recurring grounds-maintenance work.",
+      "platform": "StartEngine",
+      "offeringUrl": "https://www.startengine.com/offering/graze",
+      "issuerOfferingUrl": null,
+      "website": null,
+      "status": "closed-historical",
+      "statusLabel": "Closed round · watchlist",
+      "statusEvidence": "Accessible StartEngine page is titled Invest in Graze (2021 Round) and explicitly says Offering Closed. Current operating status and any newer offering were not verified.",
+      "instrument": "Common stock (historical round)",
+      "exemption": "Regulation A+ (historical round)",
+      "minimumInvestment": null,
+      "minimumCurrency": "USD",
+      "minimumNote": "Do not show a current investor minimum. Historical 2021 page lists $498.80.",
+      "sharePrice": null,
+      "deadline": null,
+      "deadlineLabel": "2021 round closed",
+      "deadlineNote": "Historical page deadline is July 1, 2021 at 6:59 AM UTC. This is not a current investment opportunity.",
+      "useOfProceeds": null,
+      "useOfProceedsNote": "Not verified from the historical offering circular; no current use-of-proceeds claim should be shown.",
+      "evidence": [
+        {
+          "source": "https://www.startengine.com/offering/graze",
+          "quote": "Invest in Graze (2021 Round) | StartEngine ... Offering Closed ... OFFERING TYPE Equity ... SHARES OFFERED Common Stock."
+        }
+      ],
+      "documents": [
+        {
+          "label": "Historical 2021 offering circular (linked by portal; not reviewed)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1734237/000110465921012134/tm215431-1_253g2.htm"
+        }
+      ],
+      "images": [
+        {
+          "sourceUrl": "https://d19j0qt0x55bap.cloudfront.net/production/startups/5fc93edd4ce5a80fd4d23f58/images/startup_cover/desktop_graze-main_image.jpg",
+          "sourcePage": "https://www.startengine.com/offering/graze",
+          "alt": "Graze autonomous mower on grass, from its historical offering page.",
+          "kind": "photograph"
+        }
+      ],
+      "verifiedAt": "2026-09-13",
+      "verificationScope": "Public issuer pages and accessible offering documents; no authenticated transaction or investment was attempted."
+    }
+  ],
+  "editorialNotes": [
+    "Miso, Atombeam, and Greenfield are currently advertised by their issuers. Use issuer-reported status language, not a guarantee of investment availability.",
+    "For a strict verified-active-only filter, exclude Greenfield pending final circular/qualification confirmation, and exclude historical Graze.",
+    "All linked assets are downloaded original materials, not AI-created substitutes. Reuse rights were not independently established.",
+    "Excluded BOXABL: current official site says it trades on Nasdaq as BXBL, so it is not presented as an active crowdfunding equity raise.",
+    "Excluded Future Acres: current domain serves unrelated content.",
+    "Republic returned HTTP 403. It was not bypassed. Miso Republic association is confirmed by SEC supplement."
+  ]
+}

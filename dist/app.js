@@ -8,102 +8,121 @@ const companies = [
   { id:'nothing', name:'Nothing', sector:'Consumer', category:'Consumer technology', description:'Making everyday technology feel a little more human.', detail:'Nothing is a consumer technology company making smartphones, audio products, and other connected devices.', cost:30000, color:'#5f737f', tint:'#e3e8eb', website:'https://nothing.tech/' },
   { id:'levels', name:'Levels', sector:'Health', category:'Metabolic health', description:'A more personal understanding of your metabolic health.', detail:'Levels offers tools and educational experiences intended to help people understand their metabolic health and lifestyle patterns.', cost:20000, color:'#91af98', tint:'#e5f0e5', website:'https://www.levels.com/' }
 ];
-const totalCost = companies.reduce((sum,c)=>sum+c.cost,0);
-const state = { filter:'All', query:'', sort:'featured', view:'explore', demoAccount:false, selected:null };
+
 const $ = selector => document.querySelector(selector);
 const money = value => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:Number.isInteger(value)?0:2}).format(value);
-const percent = company => company.cost / totalCost * 100;
-const escapeHtml = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const escapeHtml = value => String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const totalCost = companies.reduce((sum,c)=>sum+c.cost,0);
+const percent = c => c.cost/totalCost*100;
+const interest = .005;
+const opportunities = FUNDING_OPPORTUNITIES.map(c=>({availability:'open',statusNote:'The source listed this offering as fundraising on September 13, 2026.',documents:null,additionalSources:[],minimum:null,closing:null,...c}));
+const state = {filter:'All',query:'',sort:'featured',view:'treasury',demoAccount:true,selected:null,profileTab:'overview',watched:new Set(opportunities.filter(c=>['miso-robotics','startengine','atombeam'].includes(c.id)).map(c=>c.id))};
 const localLogoIds = new Set(['mercury','gumroad','nothing']);
 const logo = c => `<span class="company-logo" style="--company-color:${c.color}">${localLogoIds.has(c.id)?`<img src="/assets/${c.id}-logo.png" alt="" loading="lazy">`:''}<span class="company-monogram" ${localLogoIds.has(c.id)?'hidden':''}>${c.name.slice(0,1)}</span></span>`;
-function setupLogoFallbacks(root=document){root.querySelectorAll('.company-logo img').forEach(img=>{img.addEventListener('error',()=>{img.hidden=true;img.nextElementSibling.hidden=false;},{once:true});});}
-const opportunities = FUNDING_OPPORTUNITIES;
-const dateLabel = date => date ? new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',timeZone:'UTC'}).format(new Date(date+'T12:00:00Z')) : 'See offering';
-const deadlinePassed = c => c.closing && c.closing < new Date().toISOString().slice(0,10);
-const instrumentLabel = c => c.instrument === 'Equity' ? 'Common stock' : 'Business loan';
-function opportunityCard(c) {
-  const ended = deadlinePassed(c);
-  return `<article class="opportunity-card ${c.instrument==='Equity'?'equity-card':''}">
-    <button class="opportunity-media" data-opportunity="${c.id}" aria-label="Read about ${escapeHtml(c.name)}">
-      <img src="${c.image}" alt="${escapeHtml(c.imageAlt)}" width="660" height="380" loading="lazy">
-      <span class="instrument-badge ${c.instrument==='Equity'?'equity-badge':''}"><span aria-hidden="true">${c.instrument==='Equity'?'◈':'↗'}</span> ${instrumentLabel(c)}</span>
-      ${c.id==='startengine'?'<span class="image-caption">Howard Marks · Co-founder</span>':''}
-    </button>
-    <div class="opportunity-body">
-      <div class="opportunity-category"><span>${escapeHtml(c.category)}</span><span>${escapeHtml(c.location)}</span></div>
-      <h3><button data-opportunity="${c.id}">${escapeHtml(c.name)}</button></h3>
-      <p class="opportunity-description">${escapeHtml(c.description)}</p>
-      <div class="opportunity-metrics"><div><span>Minimum investment</span><strong>${money(c.minimum)}</strong></div><div><span>${ended?'Listed deadline passed':'Listed close'}</span><strong class="closing-value">${dateLabel(c.closing)}${c.closing?'<small>2026</small>':''}</strong></div></div>
-      <div class="opportunity-footer"><span class="platform-name"><i class="platform-dot ${c.platform==='StartEngine'?'se-dot':''}" aria-hidden="true"></i>${c.platform}</span><button class="offering-details-button" data-opportunity="${c.id}" aria-label="View ${escapeHtml(c.name)} offering details">Details <span aria-hidden="true">+</span></button></div>
-      <a class="offering-link" href="${c.source}" target="_blank" rel="noopener noreferrer" aria-label="View ${escapeHtml(c.name)} offering on ${c.platform}">View original offering <span aria-hidden="true">↗</span></a>
-    </div>
-  </article>`;
-}
-function filteredCompanies(){
-  return opportunities.filter(c => (state.filter==='All'||c.instrument===state.filter||c.sector===state.filter)&&`${c.name} ${c.sector} ${c.category} ${c.location} ${c.platform}`.toLowerCase().includes(state.query.toLowerCase().trim())).sort((a,b)=>{
-    if(state.sort==='name')return a.name.localeCompare(b.name);
-    if(state.sort==='minimum')return a.minimum-b.minimum;
-    if(state.sort==='closing')return (a.closing||'9999').localeCompare(b.closing||'9999');
-    return opportunities.indexOf(a)-opportunities.indexOf(b);
-  });
-}
+function setupLogoFallbacks(root=document){root.querySelectorAll('.company-logo img').forEach(img=>img.addEventListener('error',()=>{img.hidden=true;img.nextElementSibling.hidden=false;},{once:true}));}
+const dateLabel = date => date ? new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',timeZone:'UTC'}).format(new Date(date+'T12:00:00Z')) : 'Not stated';
+const deadlinePassed = c => c.closingAt ? new Date(c.closingAt)<new Date() : c.closing && c.closing<new Date().toISOString().slice(0,10);
+const availabilityLabel = c => c.availability==='closed'?'Previous round closed':c.availability==='unverified'?'Funding status unverified':deadlinePassed(c)?'Listed deadline passed':'Offering reported open';
+const hasCurrentTerms = c => c.availability==='open';
+const minimumLabel = c => hasCurrentTerms(c)&&c.minimum!==null?money(c.minimum):'Check source';
+const instrumentLabel = c => c.instrument==='Debt'?'Business loan':c.security||'Equity research';
+const bookmarkIcon = saved => `<svg viewBox="0 0 24 24" aria-hidden="true"${saved?' class="saved-icon"':''}><path d="M6 4h12v17l-6-4-6 4Z"/></svg>`;
+const arrowIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg>';
+function watchButton(c,extraClass='') {return `<button class="watch-button ${extraClass}" data-watch="${c.id}" aria-pressed="${state.watched.has(c.id)}" aria-label="${state.watched.has(c.id)?'Remove':'Add'} ${escapeHtml(c.name)} ${state.watched.has(c.id)?'from':'to'} research watchlist">${bookmarkIcon(state.watched.has(c.id))}</button>`;}
+function opportunityCard(c){return `<article class="opportunity-card">
+  <div class="opportunity-media"><button data-opportunity="${c.id}" aria-label="Read ${escapeHtml(c.name)} business profile"><img src="${c.image}" alt="${escapeHtml(c.imageAlt)}" width="720" height="460" loading="lazy" style="object-position:${c.imagePosition||'center'}"></button>${watchButton(c)}</div>
+  <div class="opportunity-body"><div class="opportunity-category"><span>${escapeHtml(c.category)}</span><span>${escapeHtml(c.platform)}</span></div><h3><button data-opportunity="${c.id}">${escapeHtml(c.name)}</button></h3><p class="opportunity-description">${escapeHtml(c.description)}</p>
+    <div class="offering-status ${c.availability!=='open'||deadlinePassed(c)?'status-muted':''}">${availabilityLabel(c)}</div><div class="opportunity-metrics"><div><span>${hasCurrentTerms(c)?(c.feeNote?'Minimum, before fees':'Minimum investment'):'Current terms'}</span><strong>${minimumLabel(c)}</strong>${c.feeNote?'<small class="fee-caption">+ 3.5% fee</small>':''}</div><div><span>Instrument</span><strong class="instrument-value">${escapeHtml(instrumentLabel(c))}</strong></div></div>
+    <button class="profile-link" data-opportunity="${c.id}">Explore business ${arrowIcon}</button>
+  </div></article>`;}
+function filteredCompanies(){return opportunities.filter(c=>(state.filter==='All'||c.instrument===state.filter||c.sector===state.filter||(state.filter==='Watchlist'&&state.watched.has(c.id)))&&`${c.name} ${c.sector} ${c.category} ${c.location} ${c.platform}`.toLowerCase().includes(state.query.toLowerCase().trim())).sort((a,b)=>{
+  if(state.sort==='name')return a.name.localeCompare(b.name);
+  if(state.sort==='minimum')return (hasCurrentTerms(a)&&a.minimum!==null?a.minimum:Infinity)-(hasCurrentTerms(b)&&b.minimum!==null?b.minimum:Infinity);
+  if(state.sort==='closing')return (hasCurrentTerms(a)&&a.closing?a.closing:'9999').localeCompare(hasCurrentTerms(b)&&b.closing?b.closing:'9999');
+  return opportunities.indexOf(a)-opportunities.indexOf(b);
+});}
 function renderCompanies(){
-  const list=filteredCompanies();
-  $('#company-grid').innerHTML=list.map(opportunityCard).join('');
-  $('#company-count').textContent=String(list.length);
-  $('#results-announcement').textContent=`${list.length} ${list.length===1?'opportunity':'opportunities'} shown`;
-  $('#empty-state').hidden=list.length>0;
-  $('#company-grid').hidden=list.length===0;
-  $('#opportunity-total').textContent=String(opportunities.length);
-  $('#equity-total').textContent=String(opportunities.filter(c=>c.instrument==='Equity').length);
-  $('#loan-total').textContent=String(opportunities.filter(c=>c.instrument==='Debt').length);
+  const list=filteredCompanies(),equity=list.filter(c=>c.instrument==='Equity'),debt=list.filter(c=>c.instrument==='Debt');
+  $('#equity-grid').innerHTML=equity.map(opportunityCard).join('');$('#debt-grid').innerHTML=debt.map(opportunityCard).join('');
+  $('#equity-section').hidden=!equity.length;$('#debt-section').hidden=!debt.length;$('#empty-state').hidden=!!list.length;
+  $('#company-count').textContent=String(opportunities.length);$('#equity-total').textContent=String(equity.length);$('#loan-total').textContent=String(debt.length);$('#watch-filter-count').textContent=String(state.watched.size);
+  $('#results-announcement').textContent=`${list.length} ${list.length===1?'business':'businesses'} shown`;
   document.querySelectorAll('[data-filter]').forEach(b=>{const active=b.dataset.filter===state.filter;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
 }
-function openOpportunity(id){
-  const c=opportunities.find(c=>c.id===id);
-  if(!c)throw new Error('Unknown opportunity');
-  state.selected=id;
-  const fundingRows=c.target!==null?`<div><dt>Campaign target</dt><dd>${money(c.target)}</dd></div><div><dt>Reported raised · Sep 13</dt><dd>${money(c.raised)}</dd></div>`:'';
-  $('#holding-detail').innerHTML=`
-    <div class="offering-detail-cover"><img src="${c.image}" alt="${escapeHtml(c.imageAlt)}"><button class="icon-button dialog-close" data-close aria-label="Close offering details">×</button><span class="instrument-badge ${c.instrument==='Equity'?'equity-badge':''}">${instrumentLabel(c)}</span></div>
-    <div class="offering-detail-heading"><p class="eyebrow">${escapeHtml(c.category)} · ${escapeHtml(c.location)}</p><h2 id="holding-title">${escapeHtml(c.name)}</h2><p>${escapeHtml(c.detail)}</p></div>
-    <div class="detail-body">
-      <div class="detail-metrics"><div><span>Minimum investment</span><strong>${money(c.minimum)}</strong></div><div><span>${deadlinePassed(c)?'Listed deadline passed':'Listed closing date'}</span><strong>${dateLabel(c.closing)}${c.closing?' <small>2026</small>':''}</strong></div></div>
-      <dl class="detail-info"><div><dt>Legal issuer</dt><dd>${escapeHtml(c.issuer)}</dd></div><div><dt>Security</dt><dd>${c.security}</dd></div><div><dt>Offering framework</dt><dd>${c.exemption}</dd></div>${fundingRows}<div><dt>Source platform</dt><dd>${c.platform}</dd></div><div><dt>Availability checked</dt><dd>September 13, 2026</dd></div><div><dt>Mainstreet position</dt><dd>No investment made</dd></div></dl>
-      <div class="use-of-funds"><h3>What the funding supports</h3><p>${escapeHtml(c.use)}</p></div>
-      <div class="dialog-disclaimer">${escapeHtml(c.termsNote)} ${c.id==='azure-printed-homes'?'The source page contains differing interest-rate figures; confirm the governing documents before relying on a rate. ':''}Availability and eligibility can change.</div>
-      <div class="detail-action-row"><a class="button button-dark" href="${c.source}" target="_blank" rel="noopener noreferrer">View original offering ↗</a><a class="button button-light" href="${c.documents||c.website}" target="_blank" rel="noopener noreferrer">${c.documents?'Offering circular':'Company website'} ↗</a></div>
-      <p class="source-credit">Company information and photography: ${c.platform}. Independently listed; no affiliation or endorsement.</p>
-    </div>`;
-  $('#holding-dialog').showModal();
-  return {company:c.name,instrument:c.security,minimum:c.minimum,source:c.source,checked:c.checked,noMainstreetInvestment:true};
+function renderWatchlist(){
+  const watched=opportunities.filter(c=>state.watched.has(c.id));$('#watchlist-count').textContent=String(watched.length);
+  $('#research-peek').innerHTML=watched.length?watched.slice(0,3).map(c=>`<button class="research-card" data-opportunity="${c.id}"><img src="${c.image}" alt="" loading="lazy" style="object-position:${c.imagePosition||'center'}"><span class="research-card-copy"><span>${escapeHtml(c.category)}</span><strong>${escapeHtml(c.name)}</strong><small>${availabilityLabel(c)}</small></span>${arrowIcon}</button>`).join(''):'<div class="research-empty">Your research list is empty. Use the bookmark on a business profile to add it for this session.</div>';
 }
-
-function setView(view){if(!['explore','treasury','holdings'].includes(view))view='explore';const changed=state.view!==view;state.view=view;if(changed)window.scrollTo({top:0,behavior:'auto'});document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==`view-${view}`);document.querySelectorAll('[data-view]').forEach(el=>{el.classList.toggle('active',el.dataset.view===view);if(el.dataset.view===view)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});document.title=`${view==='explore'?'Opportunities':view==='treasury'?'Demo treasury':'My holdings'} — Mainstreet`;}
+function toggleWatch(id){const c=opportunities.find(c=>c.id===id);if(!c)throw new Error('Unknown business');if(state.watched.has(id))state.watched.delete(id);else state.watched.add(id);renderCompanies();renderWatchlist();if($('#holding-dialog').open&&state.selected===id)renderProfile(c);toast(`${c.name} ${state.watched.has(id)?'added to':'removed from'} your session watchlist.`);return {id,watched:state.watched.has(id),sessionOnly:true};}
+function sourceLink(url,label,detail=''){return `<a class="document-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"><span><strong>${escapeHtml(label)}</strong>${detail?`<small>${escapeHtml(detail)}</small>`:''}</span>${arrowIcon}</a>`;}
+function renderProfile(c){
+  const fundingRows=c.target!==null&&c.target!==undefined?`<div><dt>Campaign target</dt><dd>${money(c.target)}</dd></div>${c.raised!==null&&c.raised!==undefined?`<div><dt>Reported raised · Sep 13</dt><dd>${money(c.raised)}</dd></div>`:''}`:'';
+  const docs=[sourceLink(c.source,c.platform+' offering page','Confirm availability, eligibility, and complete terms'),...(c.documents?[sourceLink(c.documents,'Offering document','Original filing or offering circular')]:[]),...(c.additionalSources||[]).map(s=>sourceLink(s.url,s.label,s.detail||'')),...(c.website?[sourceLink(c.website,'Company website','Learn about the operating business')]:[])].join('');
+  const overview=`<div class="profile-overview-grid"><div><h3>About the business</h3><p>${escapeHtml(c.detail)}</p><h3>What the funding supports</h3><p>${escapeHtml(c.use)}</p></div><aside class="profile-facts"><h3>Business snapshot</h3><dl><div><dt>Location</dt><dd>${escapeHtml(c.location||'Not verified')}</dd></div><div><dt>Sector</dt><dd>${escapeHtml(c.sector)}</dd></div><div><dt>Legal issuer</dt><dd>${escapeHtml(c.issuer||'See offering documents')}</dd></div><div><dt>Mainstreet position</dt><dd>Not purchased</dd></div></dl></aside></div>`;
+  const offering=`<div class="profile-overview-grid"><div><h3>Investment terms</h3><dl class="detail-info"><div><dt>Security</dt><dd>${escapeHtml(c.security)}</dd></div><div><dt>Offering framework</dt><dd>${escapeHtml(c.exemption||'Confirm with source')}</dd></div><div><dt>Minimum investment</dt><dd>${minimumLabel(c)}</dd></div>${c.feeNote?`<div><dt>Additional fees</dt><dd>${escapeHtml(c.feeNote)}</dd></div>`:''}<div><dt>Listed closing date</dt><dd>${hasCurrentTerms(c)&&c.closing?dateLabel(c.closing)+' '+c.closing.slice(0,4):'Not currently verified'}</dd></div>${fundingRows}</dl></div><aside class="profile-terms-note"><h3>Before investing</h3><p>${escapeHtml(c.termsNote)}</p>${c.id==='azure-printed-homes'?'<p>The source page contains differing interest-rate figures; confirm the governing documents before relying on a rate.</p>':''}</aside></div>`;
+  const documents=`<div class="profile-documents"><div><h3>Read the original sources</h3><p>Review the provider’s documents and current offering status before making a decision.</p></div><div>${docs}</div></div>`;
+  $('#holding-detail').innerHTML=`<div class="profile-cover"><img src="${c.image}" alt="${escapeHtml(c.imageAlt)}" style="object-position:${c.imagePosition||'center'}"><button class="icon-button dialog-close" data-close aria-label="Close ${escapeHtml(c.name)} profile">×</button><span class="profile-cover-credit">${escapeHtml(c.photoCredit||c.platform)} photography</span></div>
+    <div class="profile-title-row"><div><p class="eyebrow">${escapeHtml(c.category)}${c.location?' / '+escapeHtml(c.location):''}</p><h2 id="holding-title">${escapeHtml(c.name)}</h2><p>${escapeHtml(c.description)}</p></div>${watchButton(c,'profile-watch')}</div>
+    <div class="profile-status-bar"><div><span class="offering-status ${c.availability!=='open'||deadlinePassed(c)?'status-muted':''}">${availabilityLabel(c)}</span><span>Research checked September 13, 2026</span></div><span class="position-label">Research candidate · not purchased</span></div>
+    <div class="profile-tabs" role="tablist" aria-label="Business profile">${['overview','offering','documents'].map(tab=>`<button role="tab" id="profile-tab-${tab}" data-profile-tab="${tab}" aria-selected="${state.profileTab===tab}" aria-controls="profile-panel-${tab}" tabindex="${state.profileTab===tab?'0':'-1'}">${tab==='overview'?'Business overview':tab==='offering'?'Investment terms':'Documents & sources'}</button>`).join('')}</div>
+    <div class="profile-content">${[['overview',overview],['offering',offering],['documents',documents]].map(([tab,html])=>`<section role="tabpanel" id="profile-panel-${tab}" aria-labelledby="profile-tab-${tab}" ${state.profileTab!==tab?'hidden':''}>${html}</section>`).join('')}<div class="source-note"><strong>Source note</strong><p>${escapeHtml(c.statusNote)} ${c.availability==='open'?'Availability can change after the research date.':''}</p></div></div>
+    <div class="profile-footer"><span>No affiliation or company endorsement.</span><a class="button button-dark" href="${c.source}" target="_blank" rel="noopener noreferrer">View original offering ${arrowIcon}</a></div>`;
+}
+function openOpportunity(id){const c=opportunities.find(c=>c.id===id);if(!c)throw new Error('Unknown business');state.selected=id;state.profileTab='overview';renderProfile(c);if(!$('#holding-dialog').open)$('#holding-dialog').showModal();return {company:c.name,instrument:c.security,minimum:c.minimum,source:c.source,checked:c.checked,availability:c.availability,noMainstreetInvestment:true};}
+function changeProfileTab(tab,focus=true){if(!['overview','offering','documents'].includes(tab))return;state.profileTab=tab;document.querySelectorAll('[data-profile-tab]').forEach(b=>{const active=b.dataset.profileTab===tab;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;if(active&&focus)b.focus();});['overview','offering','documents'].forEach(t=>$(`#profile-panel-${t}`).hidden=t!==tab);}
+const ledger = [
+  {date:'2026-09-01',type:'receipt',description:'Trading fee receipt',amount:100000},
+  {date:'2026-09-02',type:'investment',description:'Substack model allocation',company:'substack',amount:-65000},
+  {date:'2026-09-04',type:'receipt',description:'Trading fee receipt',amount:93750},
+  {date:'2026-09-05',type:'investment',description:'Replit model allocation',company:'replit',amount:-55000},
+  {date:'2026-09-06',type:'investment',description:'Mercury model allocation',company:'mercury',amount:-45000},
+  {date:'2026-09-08',type:'receipt',description:'Trading fee receipt',amount:75000},
+  {date:'2026-09-09',type:'investment',description:'Gumroad model allocation',company:'gumroad',amount:-35000},
+  {date:'2026-09-10',type:'investment',description:'Nothing model allocation',company:'nothing',amount:-30000},
+  {date:'2026-09-12',type:'investment',description:'Levels model allocation',company:'levels',amount:-20000}
+];
+const totalFees=ledger.filter(e=>e.type==='receipt').reduce((sum,e)=>sum+e.amount,0);
+const totalInvestments=-ledger.filter(e=>e.type==='investment').reduce((sum,e)=>sum+e.amount,0);
+const cashBalance=totalFees-totalInvestments;
+function renderLedger(){const amountMarkup=value=>{const parts=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(value).split('.');return `${parts[0]}<span>.${parts[1]}</span>`;};$('#total-assets').innerHTML=amountMarkup(totalCost+cashBalance);$('#holder-assets').innerHTML=amountMarkup((totalCost+cashBalance)*interest);let balance=0;$('#ledger-table').innerHTML=ledger.map(e=>{balance+=e.amount;return `<tr><td>${dateLabel(e.date)}</td><td>${escapeHtml(e.description)}</td><td class="${e.amount>0?'positive-amount':''}">${e.amount>0?'+':'−'}${money(Math.abs(e.amount))}</td><td>${money(balance)}</td></tr>`;}).join('');
+  $('#activity-list').innerHTML=ledger.slice(-4).reverse().map(e=>`<li><span class="activity-symbol ${e.type==='receipt'?'receipt-symbol':''}" aria-hidden="true">${e.type==='receipt'?'↓':'↗'}</span><div><strong>${e.company?`<button data-company="${e.company}">${escapeHtml(e.description.replace(' model allocation',''))}</button>`:'Fee receipt'}</strong><span>${e.type==='receipt'?'Trading fees':'Model allocation'} · ${dateLabel(e.date)}</span></div><strong class="${e.amount>0?'positive-amount':''}">${e.amount>0?'+':'−'}${money(Math.abs(e.amount))}</strong></li>`).join('');
+  $('#fee-receipts').textContent=money(totalFees);$('#capital-allocated').textContent=money(totalInvestments);$('#available-cash').textContent=money(cashBalance);$('#activity-cash').textContent=money(cashBalance);$('#holder-cost').textContent=money(totalCost*interest);$('#holder-cash').textContent=money(cashBalance*interest);
+}
+function renderTables(){
+  const row=(c,holder)=>`<tr><td><button class="table-company" data-company="${c.id}">${logo(c)}<span><strong>${c.name}</strong><small>${c.sector}</small></span></button></td><td class="table-value" data-label="${holder?'Attributed cost':'Acquisition cost'}">${money(c.cost*(holder?interest:1))}</td><td data-label="Weight"><span class="table-weight">${percent(c)}%<i><span style="width:${percent(c)}%;background:${c.color}"></span></i></span></td><td><button class="row-button" data-company="${c.id}" aria-label="View ${c.name} model position">↗</button></td></tr>`;
+  $('#treasury-table').innerHTML=companies.map(c=>row(c,false)).join('');$('#holdings-table').innerHTML=companies.map(c=>row(c,true)).join('');$('#allocation-legend').innerHTML=companies.map(c=>`<li><i style="background:${c.color}"></i><span>${c.name}</span><strong>${percent(c)}%</strong></li>`).join('');setupLogoFallbacks();
+}
+function openHolding(id){const c=companies.find(c=>c.id===id);if(!c)throw new Error('Unknown company');state.selected=id;$('#holding-detail').innerHTML=`<div class="model-position-heading"><button class="icon-button dialog-close" data-close aria-label="Close model position">×</button>${logo(c)}<p class="eyebrow">ILLUSTRATIVE POSITION</p><h2 id="holding-title">${c.name}</h2><p>${c.detail}</p></div><div class="model-position-body"><div class="detail-metrics"><div><span>Sample acquisition cost</span><strong>${money(c.cost)}</strong></div><div><span>Model allocation</span><strong>${percent(c)}%</strong></div><div><span>Your attributed cost</span><strong>${money(c.cost*interest)}</strong></div></div><dl class="detail-info"><div><dt>Security</dt><dd>Not selected · model allocation only</dd></div><div><dt>Purchase status</dt><dd>No investment has been made</dd></div><div><dt>Purchase documents</dt><dd>None · synthetic ledger entry</dd></div><div><dt>Valuation basis</dt><dd>Illustrative acquisition cost</dd></div><div><dt>Current offering availability</dt><dd>Not verified for this company</dd></div></dl><div class="dialog-disclaimer">${c.name} is a real company. This position and its allocation are fictional examples. They are not real shares, confirmed purchases, or an endorsement.</div><div class="detail-action-row"><a class="button button-dark" href="${c.website}" target="_blank" rel="noopener noreferrer">Company website ↗</a><button class="button button-light" data-close>Back to portfolio</button></div></div>`;setupLogoFallbacks($('#holding-detail'));if(!$('#holding-dialog').open)$('#holding-dialog').showModal();return {company:c.name,sampleCost:c.cost,allocationPercent:percent(c),demoOnly:true};}
+function setView(view){if(!['explore','treasury','holdings'].includes(view))view='treasury';const changed=state.view!==view;state.view=view;if(changed)window.scrollTo({top:0,behavior:'auto'});document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==`view-${view}`);document.querySelectorAll('[data-view]').forEach(el=>{const active=el.dataset.view===view;el.classList.toggle('active',active);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});document.title=`${view==='explore'?'Businesses':view==='treasury'?'Treasury':'My portfolio'} — Mainstreet`;}
 function navigate(view){if(!['explore','treasury','holdings'].includes(view))throw new Error('Unknown view');if(location.hash!==`#${view}`)location.hash=view;else setView(view);}
-function openHolding(id){const c=companies.find(c=>c.id===id);if(!c)throw new Error('Unknown company');state.selected=id;$('#holding-detail').innerHTML=`<div class="detail-banner" style="--company-color:${c.color};--company-tint:${c.tint}"><button class="icon-button dialog-close" data-close aria-label="Close company details">×</button>${logo(c)}<h2 id="holding-title">${c.name}</h2><p>${c.detail}</p><div class="detail-tags"><span class="sector-tag">${c.category}</span><span class="position-tag">Illustrative holding</span></div></div><div class="detail-body"><div class="detail-metrics"><div><span>Sample acquisition cost</span><strong>${money(c.cost)}</strong></div><div><span>Demo portfolio allocation</span><strong>${percent(c)}%</strong></div></div><dl class="detail-info"><div><dt>Company website</dt><dd><a href="${c.website}" target="_blank" rel="noopener noreferrer">${new URL(c.website).hostname.replace('www.','')} ↗</a></dd></div><div><dt>Investment instrument</dt><dd>Not selected · prototype only</dd></div><div><dt>Offering availability</dt><dd>Not verified</dd></div><div><dt>Ownership documents</dt><dd class="demo-text">No investment has been made</dd></div><div><dt>Valuation</dt><dd>No market valuation claimed</dd></div>${state.demoAccount?`<div><dt>Your sample attributable cost</dt><dd>${money(c.cost*.005)}</dd></div>`:''}</dl><div class="dialog-disclaimer">${c.name} is a real company. This position and its allocation are fictional examples, not a live offering, confirmed investment, or company endorsement.</div><div class="detail-action-row"><a class="button button-dark" href="${c.website}" target="_blank" rel="noopener noreferrer">Visit company website ↗</a><button class="button button-light" data-close>Back to portfolio</button></div></div>`;setupLogoFallbacks($('#holding-detail'));$('#holding-dialog').showModal();return {company:c.name,sampleCost:c.cost,allocationPercent:percent(c),demoOnly:true};}
-function renderTables(){$('#treasury-table').innerHTML=companies.map(c=>`<tr><td><span class="table-company">${logo(c)}${c.name}</span></td><td>${c.sector}</td><td class="table-value">${money(c.cost)}</td><td>${percent(c)}%</td><td><span class="subtle-pill">Demo only</span></td><td><button class="row-button" data-company="${c.id}" aria-label="View ${c.name} demo details">↗</button></td></tr>`).join('');$('#holdings-table').innerHTML=companies.map(c=>`<tr><td><span class="table-company">${logo(c)}${c.name}</span></td><td class="table-value">${money(c.cost*.005)}</td><td>${percent(c)}%</td><td><button class="row-button" data-company="${c.id}" aria-label="View ${c.name} demo details">↗</button></td></tr>`).join('');$('#allocation-legend').innerHTML=companies.map(c=>`<li><i style="background:${c.color}"></i><span>${c.name}</span><strong>${percent(c)}%</strong></li>`).join('');setupLogoFallbacks();}
 let toastTimer;
-function toast(message){clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').classList.add('show');toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),3200);}
-function useDemoAccount(){state.demoAccount=true;$('#wallet-empty').hidden=true;$('#holdings-content').hidden=false;$('#wallet-button span').textContent='Demo account';$('#disconnect-demo').hidden=false;$('#use-demo-account').textContent='View demo holdings ↗';if($('#wallet-dialog').open)$('#wallet-dialog').close();navigate('holdings');toast('Demo account opened. No wallet connected.');return {demoAccount:true,samplePortfolioInterest:.005};}
-function endDemoAccount(){state.demoAccount=false;$('#wallet-empty').hidden=false;$('#holdings-content').hidden=true;$('#wallet-button span').textContent='Preview wallet';$('#disconnect-demo').hidden=true;$('#use-demo-account').textContent='Use demo account ↗';$('#wallet-dialog').close();toast('Demo session ended.');}
-document.addEventListener('click',event=>{const opportunityButton=event.target.closest('[data-opportunity]');if(opportunityButton){openOpportunity(opportunityButton.dataset.opportunity);return;}const companyButton=event.target.closest('[data-company]');if(companyButton){openHolding(companyButton.dataset.company);return;}const filter=event.target.closest('[data-filter]');if(filter){state.filter=filter.dataset.filter;renderCompanies();return;}const close=event.target.closest('[data-close]');if(close){close.closest('dialog')?.close();}});
-$('#company-search').addEventListener('input',e=>{state.query=e.target.value;renderCompanies();});
-$('#company-sort').addEventListener('change',e=>{state.sort=e.target.value;renderCompanies();});
-$('#reset-filters').addEventListener('click',()=>{state.filter='All';state.query='';$('#company-search').value='';renderCompanies();$('#company-search').focus();});
-$('#about-button').addEventListener('click',()=>$('#about-dialog').showModal());
-$('#footer-about').addEventListener('click',()=>$('#about-dialog').showModal());
-$('#wallet-button').addEventListener('click',()=>$('#wallet-dialog').showModal());
-$('#holdings-preview-button').addEventListener('click',useDemoAccount);
-$('#use-demo-account').addEventListener('click',useDemoAccount);
-$('#disconnect-demo').addEventListener('click',endDemoAccount);
+function toast(message){clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').classList.add('show');toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),3500);}
+function useDemoAccount(){state.demoAccount=true;$('#wallet-empty').hidden=true;$('#holdings-content').hidden=false;$('#wallet-button span').textContent='Demo account';$('#disconnect-demo').hidden=false;$('#use-demo-account').textContent='View demo portfolio ↗';if($('#wallet-dialog').open)$('#wallet-dialog').close();navigate('holdings');return {demoAccount:true,samplePortfolioInterest:interest};}
+function endDemoAccount(){state.demoAccount=false;$('#wallet-empty').hidden=false;$('#holdings-content').hidden=true;$('#wallet-button span').textContent='Preview wallet';$('#disconnect-demo').hidden=true;$('#use-demo-account').textContent='Open demo portfolio ↗';$('#wallet-dialog').close();toast('Demo session ended.');}
+document.addEventListener('click',event=>{
+  const watch=event.target.closest('[data-watch]');if(watch){toggleWatch(watch.dataset.watch);return;}
+  const opportunity=event.target.closest('[data-opportunity]');if(opportunity){openOpportunity(opportunity.dataset.opportunity);return;}
+  const company=event.target.closest('[data-company]');if(company){openHolding(company.dataset.company);return;}
+  const filter=event.target.closest('[data-filter]');if(filter){state.filter=filter.dataset.filter;renderCompanies();return;}
+  const tab=event.target.closest('[data-profile-tab]');if(tab){changeProfileTab(tab.dataset.profileTab);return;}
+  const close=event.target.closest('[data-close]');if(close)close.closest('dialog')?.close();
+});
+document.addEventListener('keydown',event=>{const tab=event.target.closest('[data-profile-tab]');if(!tab||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const tabs=['overview','offering','documents'],i=tabs.indexOf(tab.dataset.profileTab);changeProfileTab(tabs[event.key==='Home'?0:event.key==='End'?2:(i+(event.key==='ArrowRight'?1:2))%3]);});
+$('#company-search').addEventListener('input',e=>{state.query=e.target.value;renderCompanies();});$('#company-sort').addEventListener('change',e=>{state.sort=e.target.value;renderCompanies();});
+$('#reset-filters').addEventListener('click',()=>{state.filter='All';state.query='';state.sort='featured';$('#company-search').value='';$('#company-sort').value='featured';renderCompanies();$('#company-search').focus();});
+$('#view-watchlist').addEventListener('click',()=>{state.filter='Watchlist';state.query='';$('#company-search').value='';renderCompanies();});
+['about-button','footer-about'].forEach(id=>$(`#${id}`).addEventListener('click',()=>$('#about-dialog').showModal()));
+['ledger-button','all-activity-button'].forEach(id=>$(`#${id}`).addEventListener('click',()=>$('#ledger-dialog').showModal()));
+['rights-button','portfolio-rights-button','holder-rights-button'].forEach(id=>$(`#${id}`).addEventListener('click',()=>$('#rights-dialog').showModal()));
+$('#wallet-button').addEventListener('click',()=>$('#wallet-dialog').showModal());$('#holdings-preview-button').addEventListener('click',useDemoAccount);$('#use-demo-account').addEventListener('click',useDemoAccount);$('#disconnect-demo').addEventListener('click',endDemoAccount);
 document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}}));
 window.addEventListener('hashchange',()=>setView(location.hash.slice(1)));
-renderCompanies();renderTables();setView(location.hash.slice(1)||'explore');
-
+renderCompanies();renderTables();renderLedger();renderWatchlist();setView(location.hash.slice(1)||'treasury');
 // Optional structured access mirrors the same visible prototype actions.
 if(document.modelContext?.registerTool){const lifecycle=new AbortController();const tools=[
- {name:'list_funding_opportunities',title:'List sourced funding opportunities',description:'Read the dated snapshot of external equity and business-loan offerings. Availability must be confirmed with the source; Mainstreet has made no investments.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute(input){if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length)throw new Error('Expected an empty object');return {checked:'2026-09-13',liveFeed:false,opportunities:opportunities.map(c=>({id:c.id,name:c.name,instrument:c.security,minimum:c.minimum,closing:c.closing,source:c.source}))};}},
+ {name:'read_demo_treasury',title:'Read the Mainstreet model treasury',description:'Read the synthetic treasury ledger and model portfolio balances. No actual funds, purchases, or ownership exist.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:false},execute(input){if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length)throw new Error('Expected an empty object');return {demoOnly:true,feeReceipts:totalFees,investmentCost:totalCost,unallocatedCash:cashBalance,assumedLiabilities:0,distributions:0,ledger};}},
+ {name:'toggle_research_watchlist',title:'Watch or unwatch a business',description:'Add or remove a real business from the session-only research list. This does not acquire shares or make an investment.',inputSchema:{type:'object',properties:{businessId:{type:'string',enum:opportunities.map(c=>c.id)}},required:['businessId'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).some(k=>k!=='businessId')||typeof input.businessId!=='string')throw new Error('A valid businessId is required');return toggleWatch(input.businessId);}},
+ {name:'list_funding_opportunities',title:'List sourced funding opportunities',description:'Read the dated snapshot of external equity and business-loan offerings. Availability must be confirmed with the source; Mainstreet has made no investments.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute(input){if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length)throw new Error('Expected an empty object');return {checked:'2026-09-13',liveFeed:false,opportunities:opportunities.map(c=>({id:c.id,name:c.name,instrument:c.security,minimum:c.minimum,closing:c.closing,source:c.source,availability:c.availability,statusNote:c.statusNote,feeNote:c.feeNote||null}))};}},
  {name:'open_funding_opportunity',title:'Open funding opportunity details',description:'Open the visible sourced offering detail dialog without making an investment or visiting an external website.',inputSchema:{type:'object',properties:{opportunityId:{type:'string',enum:opportunities.map(c=>c.id)}},required:['opportunityId'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).some(k=>k!=='opportunityId')||typeof input.opportunityId!=='string')throw new Error('A valid opportunityId is required');return openOpportunity(input.opportunityId);}},
  {name:'list_demo_companies',title:'List Mainstreet demo companies',description:'Read the illustrative company positions. These are not actual investments or live offerings.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:false},execute(input){if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length)throw new Error('Expected an empty object');return {demoOnly:true,companies:companies.map(c=>({id:c.id,name:c.name,sector:c.sector,sampleCost:c.cost}))};}},
  {name:'open_demo_holding',title:'Open a demo holding',description:'Open the company detail dialog. No investment or wallet transaction is performed.',inputSchema:{type:'object',properties:{companyId:{type:'string',enum:companies.map(c=>c.id)}},required:['companyId'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).some(k=>k!=='companyId')||typeof input.companyId!=='string')throw new Error('A valid companyId is required');return openHolding(input.companyId);}},
