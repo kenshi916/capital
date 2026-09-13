@@ -50,6 +50,8 @@ function browser(saved) {
 test('launch UI persists drafts, calculates budget, restores safely and links directory purchases', async () => {
   const dom=browser(); const w=dom.window; const q=s=>w.document.querySelector(s);
   try {
+    assert.equal(w.document.body.dataset.view,'home');
+    w.history.replaceState(null,'','#launch'); w.dispatchEvent(new w.HashChangeEvent('hashchange'));
     assert.equal(w.document.body.dataset.view,'launch');
     assert.equal(w.document.documentElement.dataset.launchApp,'ready');
     q('[data-launch-stage="purchase"]').click();
@@ -73,7 +75,7 @@ test('launch UI persists drafts, calculates budget, restores safely and links di
     w.MainstreetDirectory.openOpportunity('miso-robotics'); q('[data-launch-business="miso-robotics"]').click();
     assert.equal(q('#launch-security').value,'Negotiated preferred stock','Repeated selection must preserve operator edits');
     w.history.replaceState(null,'','/'); w.dispatchEvent(new w.HashChangeEvent('hashchange'));
-    assert.equal(w.document.body.dataset.view,'launch','Returning to a bare URL must return to the launch page');
+    assert.equal(w.document.body.dataset.view,'home','Returning to a bare URL must return to the home page');
     const attack=packet(blankPlan()); attack.fields.entity='<img src=x onerror=alert(1)>';
     const malicious=browser(JSON.stringify(attack)); malicious.window.document.querySelector('[data-launch-stage="entity"]').click();
     assert.equal(malicious.window.document.querySelector('#launch-entity').value,attack.fields.entity);

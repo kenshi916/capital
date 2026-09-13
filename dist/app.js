@@ -48,7 +48,7 @@ function renderCompanies(){
   document.querySelectorAll('[data-filter]').forEach(b=>{const active=b.dataset.filter===state.filter;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
   document.querySelectorAll('[data-sector]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sector===state.sector)));
   const label = state.sector==='All'?'All sectors':SECTOR_GROUPS.find(g=>g.id===state.sector).label;
-  $('#sector-summary').textContent=`${label} · ${list.length} ${list.length===1?'business':'businesses'} shown`;
+  $('#sector-summary').textContent=label;
 }
 function renderSectors(){
   $('#sector-filters').innerHTML = `<button class="sector-filter" data-sector="All" aria-pressed="true">All sectors <span>${opportunities.length}</span></button>` + SECTOR_GROUPS.map(g=>`<button class="sector-filter" data-sector="${g.id}" aria-pressed="false">${escapeHtml(g.label)} <span>${opportunities.filter(c=>g.companies.includes(c.id)).length}</span></button>`).join('');
@@ -74,8 +74,8 @@ function renderProfile(c){
 }
 function openOpportunity(id){const c=opportunities.find(c=>c.id===id);if(!c)throw new Error('Unknown business');state.selected=id;state.profileTab='overview';renderProfile(c);if(!$('#holding-dialog').open)$('#holding-dialog').showModal();return {company:c.name,instrument:c.security,minimum:c.minimum,source:c.source,checked:c.checked,availability:c.availability,noMainstreetInvestment:true};}
 function changeProfileTab(tab,focus=true){if(!['overview','offering','documents'].includes(tab))return;state.profileTab=tab;document.querySelectorAll('[data-profile-tab]').forEach(b=>{const active=b.dataset.profileTab===tab;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;if(active&&focus)b.focus();});['overview','offering','documents'].forEach(t=>$(`#profile-panel-${t}`).hidden=t!==tab);}
-function setView(view){if(!['launch','explore','treasury','holdings'].includes(view))view='treasury';const changed=state.view!==view;state.view=view;document.body.dataset.view=view;if(changed)window.scrollTo({top:0,behavior:'auto'});document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==`view-${view}`);document.querySelectorAll('[data-view]').forEach(el=>{const active=el.dataset.view===view;el.classList.toggle('active',active);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});document.title=`${view==='launch'?'Launch setup':view==='explore'?'Businesses':view==='treasury'?'Treasury':'My portfolio'} — Mainstreet`;}
-function navigate(view){if(!['launch','explore','treasury','holdings'].includes(view))throw new Error('Unknown view');if(location.hash!==`#${view}`)location.hash=view;else setView(view);}
+function setView(view){if(!['home','launch','explore','treasury','holdings'].includes(view))view='home';const changed=state.view!==view;state.view=view;document.body.dataset.view=view;if(changed)window.scrollTo({top:0,behavior:'auto'});document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==`view-${view}`);document.querySelectorAll('[data-view]').forEach(el=>{const active=el.dataset.view===view;el.classList.toggle('active',active);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});document.title=`${view==='home'?'Home':view==='launch'?'Launch setup':view==='explore'?'Businesses':view==='treasury'?'Treasury':'My portfolio'} — Mainstreet`;}
+function navigate(view){if(!['home','launch','explore','treasury','holdings'].includes(view))throw new Error('Unknown view');if(location.hash!==`#${view}`)location.hash=view;else setView(view);}
 let toastTimer;
 function toast(message){clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').classList.add('show');toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),3500);}
 document.addEventListener('click',event=>{
@@ -84,7 +84,7 @@ document.addEventListener('click',event=>{
   const watch=event.target.closest('[data-watch]');if(watch){toggleWatch(watch.dataset.watch);return;}
   const opportunity=event.target.closest('[data-opportunity]');if(opportunity){openOpportunity(opportunity.dataset.opportunity);return;}
   const filter=event.target.closest('[data-filter]');if(filter){state.filter=filter.dataset.filter;renderCompanies();return;}
-  const sector=event.target.closest('[data-sector]');if(sector){state.sector=sector.dataset.sector;renderCompanies();return;}
+  const sector=event.target.closest('[data-sector]');if(sector){state.sector=sector.dataset.sector;renderCompanies();sector.closest('details').open=false;return;}
   const tab=event.target.closest('[data-profile-tab]');if(tab){changeProfileTab(tab.dataset.profileTab);return;}
   const close=event.target.closest('[data-close]');if(close)close.closest('dialog')?.close();
 });
@@ -95,7 +95,7 @@ $('#view-watchlist').addEventListener('click',()=>{state.filter='Watchlist';stat
 ['about-button','footer-about'].forEach(id=>$(`#${id}`).addEventListener('click',()=>$('#about-dialog').showModal()));
 ['ledger-button','all-activity-button'].forEach(id=>$(`#${id}`).addEventListener('click',()=>$('#ledger-dialog').showModal()));
 document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}}));
-function routeFromHash(){const hash=location.hash.slice(1);if(hash==='main')return;setView(hash||(new URL(location.href).searchParams.has('treasury')?'treasury':'launch'));}
+function routeFromHash(){const hash=location.hash.slice(1);if(hash==='main'&&document.body.dataset.view)return;setView((hash==='main'?'':hash)||(new URL(location.href).searchParams.has('treasury')?'treasury':'home'));}
 window.addEventListener('hashchange',routeFromHash);
 renderSectors();renderCompanies();renderWatchlist();routeFromHash();
 

@@ -62,6 +62,7 @@ function renderStage(focus = false) {
   $('#launch-stage-next').hidden = review;
   if (review) renderReview();
   renderSummary();
+  if (stage === 'purchase' && $('.launch-context-details')) $('.launch-context-details').open = true;
   if (focus) $('#launch-stage-title').focus({preventScroll:true});
 }
 function renderReview() {
@@ -90,7 +91,7 @@ function exportPlan(human = false) {
 async function safe(task) { try { await task(); } catch (e) { message(e.message || 'The action could not finish.', true); } }
 function initialize() {
   const root = $('#view-launch');
-  root.innerHTML = `<div class="launch-heading"><div><p class="eyebrow">MAINSTREET / LAUNCH PREPARATION</p><h1>Launch Mainstreet.</h1><p>Define the launch, document the first purchase, and prepare for review.</p></div><div class="launch-heading-actions"><button class="button button-dark" id="launch-export">Download draft</button><button class="button button-light" id="launch-import-button">Import draft</button><input type="file" id="launch-import" accept=".json,application/json" hidden></div></div>
+  root.innerHTML = `<div class="launch-heading"><div><p class="eyebrow">MAINSTREET / LAUNCH PREPARATION</p><h1>Launch setup</h1><p>Prepare your project, one step at a time.</p></div><div class="launch-heading-actions"><button class="button button-dark" id="launch-export">Download draft</button><button class="button button-light" id="launch-import-button">Import draft</button><input type="file" id="launch-import" accept=".json,application/json" hidden></div></div>
     <div class="launch-status-strip"><div><span class="launch-lock">Real-money actions locked</span><span>Testnet rehearsal available</span></div><span id="launch-save-status">Draft stays in this browser · not shared</span></div>
     <div id="launch-feedback" role="status" aria-live="polite"></div>
     <div class="launch-layout"><aside class="launch-sidebar"><div class="launch-progress-heading"><span>Plan details</span><strong id="launch-count">0 / ${FIELDS.length}</strong></div><progress id="launch-progress" max="${FIELDS.length}" value="0" aria-label="Launch plan fields filled"></progress><p>Filling the plan does not activate a launch.</p><nav aria-label="Launch plan steps">${SECTIONS.map((s,i) => `<button type="button" data-launch-stage="${s.id}"><span class="launch-step-number">0${i+1}</span><span>${esc(s.title)}</span><small data-launch-count="${s.id}">0/${s.fields.length}</small></button>`).join('')}<button type="button" data-launch-stage="review"><span class="launch-step-number">05</span><span>Review & evidence</span></button></nav><div class="launch-sidebar-foot"><span id="launch-document-count">0 references</span><a href="#treasury">Open testnet rehearsal ↗</a></div></aside>
@@ -143,6 +144,15 @@ function initialize() {
     if (plan.evidence.length >= 30) throw new Error('This draft supports up to 30 document references.');
     plan.evidence.push({type,name:file.name,sha256:hash,size:file.size,addedAt:new Date().toISOString()}); save(); renderEvidence(); renderSummary(); message('File fingerprint saved in this browser. The original file was not uploaded.');
   });
+  const wrap = (element, label, className) => {
+    const details = document.createElement('details'); details.className = className;
+    const summary = document.createElement('summary'); summary.textContent = label;
+    element.before(details); details.append(summary, element); return details;
+  };
+  wrap($('.launch-heading-actions'), 'Draft tools', 'launch-draft-tools');
+  const networkDetails = wrap($('.launch-route'), 'Network & token check', 'simple-disclosure launch-network-details');
+  const contextDetails = wrap($('.launch-context'), 'Budget & connection details', 'simple-disclosure launch-context-details');
+  $('.launch-layout').after(networkDetails, contextDetails);
   updateOffering(); document.documentElement.dataset.launchApp = 'ready';
 }
 initialize();
