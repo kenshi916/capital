@@ -21,3 +21,125 @@ h1,h2,h3{color:#101010}h1 em{font-family:var(--serif);font-weight:500;font-style
 .notice-label,.prototype-notice p,.workspace-heading .eyebrow,.directory-snapshot .metadata,.directory-snapshot strong,.panel-date,.treasury-photo-label,.treasury-photo-footer>span:last-child,.section-heading .eyebrow,.opportunity-category>span:last-child,.capital-bottom>span,.holder-interest>div>span,.sample-account-label,.metric-card>span,.metric-card p,.info-dialog .eyebrow,.ledger-dialog .eyebrow,.ledger-summary span,.footer-concept,.site-footer .footer-links>span:first-child,.footer-links .footer-demo-note,.site-footer .footer-bottom{font-size:.75rem}.profile-status-bar .offering-status,.profile-body .offering-status,.capital-metrics span,.nav-item,.header-about,.wallet-button{font-size:.875rem}.prototype-notice p{color:#857a6a}.workspace-heading .eyebrow{color:#807767}.capital-topline,.capital-metrics span,.capital-panel .capital-caption,.panel-heading p,.funding-route p,.catalog-context,.catalog-footnote,.section-note,.opportunity-description,.directory-heading p,.profile-title-row p:last-child,.profile-content p,.dialog-intro,.info-steps p,.distribution-empty p,.rights-panel p,.dialog-disclaimer{color:#706960}.holder-value-panel .capital-topline{color:#c7bdaf}.holder-value-panel .capital-caption{color:#b5a58f}.holder-interest>div>span{color:#b19d82}.profile-content .source-note p{color:#81735f}.profile-content .profile-terms-note p{color:#7b6a52}.metric-card>span,.metric-card p,.opportunity-metrics span,.research-card-copy>small,.activity-list li>div>span,.profile-status-bar>div>span:last-child,.position-label,.detail-info dt,.profile-facts dt,.document-link small{color:#887961}.site-footer .footer-links>span:first-child,.site-footer .footer-bottom,.footer-concept,.footer-links .footer-demo-note{color:#887a65}
 @media(max-width:600px){.nav-item{font-size:.8125rem}.wallet-button{font-size:.75rem}.capital-metrics span{font-size:.8125rem}.prototype-notice p{font-size:.75rem;max-width:none}.notice-label{font-size:.6875rem}.prototype-notice{align-items:flex-start}.notice-label{margin-top:4px}.workspace-heading{padding-top:30px}.workspace-heading .eyebrow{font-size:.75rem}.footer-concept,.site-footer .footer-links>span:first-child,.footer-links .footer-demo-note,.site-footer .footer-bottom{font-size:.75rem}.holder-interest>div>span{font-size:.75rem}.treasury-photo-footer>span:last-child,.treasury-photo-label,.capital-bottom>span,.section-heading .eyebrow{font-size:.75rem}.metric-card>span,.metric-card p{font-size:.75rem}.profile-status-bar>div>span:last-child,.position-label{font-size:.75rem}.info-dialog .eyebrow,.ledger-dialog .eyebrow{font-size:.75rem}.directory-snapshot .metadata,.directory-snapshot strong{font-size:.75rem}}
 @media(prefers-reduced-motion:reduce){.opportunity-card:hover{transform:none}.treasury-photo-button:hover>img{transform:none}}
+
+/* Keep the navigation at the true center, independent of the side controls. */
+@media (min-width: 801px) {
+  .site-header .header-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 16px;
+    padding: 10px 18px;
+  }
+  .site-header .wordmark { justify-self: start; }
+  .site-header .main-nav {
+    justify-self: center;
+    justify-content: center;
+    margin: 0;
+  }
+  .site-header .header-actions {
+    justify-self: end;
+    justify-content: flex-end;
+    margin: 0;
+    gap: 18px;
+  }
+}
+@media (min-width: 801px) and (max-width: 1100px) {
+  .site-header .header-about { display: none; }
+}
+.site-header .wordmark { line-height: 1; }
+.site-header .brand-name { line-height: 1; }
+.site-header .wallet-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+  line-height: 1;
+}
+.site-header .wallet-button svg { display: block; flex: 0 0 auto; }
+.site-header .wallet-button span { display: block; }
+@media (max-width: 800px) {
+  .site-header .header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 14px;
+  }
+  .site-header .header-actions { margin: 0; }
+}
+@media (max-width: 370px) {
+  .site-header .header-inner { padding: 9px 11px; gap: 8px; }
+}
+
+/* A short entrance on each page; no content depends on animation to appear. */
+@keyframes mainstreet-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes mainstreet-serif-enter {
+  from { opacity: 0; transform: translateY(13px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes mainstreet-mark-enter {
+  from { transform: scaleY(.3); opacity: .45; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+@keyframes mainstreet-dialog-enter {
+  from { opacity: 0; transform: translateY(10px) scale(.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-header .brand-mark i {
+    transform-origin: center bottom;
+    animation: mainstreet-mark-enter .7s cubic-bezier(.16,1,.3,1) both;
+  }
+  .site-header .brand-mark i:nth-child(2) { animation-delay: .08s; }
+  .site-header .brand-mark i:nth-child(3) { animation-delay: .16s; }
+  .view:not([hidden]) .workspace-heading .eyebrow,
+  .view:not([hidden]) .workspace-heading h1,
+  .view:not([hidden]) .workspace-heading > div > p:last-child,
+  .view:not([hidden]) .workspace-heading > .button,
+  .view:not([hidden]) .workspace-heading > .text-button {
+    animation: mainstreet-enter .65s cubic-bezier(.16,1,.3,1) backwards;
+  }
+  .view:not([hidden]) .workspace-heading h1 { animation-delay: .06s; }
+  .view:not([hidden]) .workspace-heading h1 em {
+    animation: mainstreet-serif-enter .75s cubic-bezier(.16,1,.3,1) .12s backwards;
+  }
+  .view:not([hidden]) .workspace-heading > div > p:last-child { animation-delay: .14s; }
+  .view:not([hidden]) .workspace-heading > .button,
+  .view:not([hidden]) .workspace-heading > .text-button { animation-delay: .2s; }
+  .view:not([hidden]) .treasury-overview > *,
+  .view:not([hidden]) .holder-overview > *,
+  .view:not([hidden]) .opportunity-card,
+  .view:not([hidden]) .research-card {
+    animation: mainstreet-enter .7s cubic-bezier(.16,1,.3,1) .12s backwards;
+  }
+  .view:not([hidden]) .treasury-overview > :nth-child(2),
+  .view:not([hidden]) .holder-overview > :nth-child(2),
+  .view:not([hidden]) .opportunity-card:nth-child(3n + 2),
+  .view:not([hidden]) .research-card:nth-child(2) { animation-delay: .2s; }
+  .view:not([hidden]) .opportunity-card:nth-child(3n),
+  .view:not([hidden]) .research-card:nth-child(3) { animation-delay: .28s; }
+  .button, .profile-link {
+    transition: transform .22s ease, background .22s ease, border-color .22s ease, box-shadow .22s ease;
+  }
+  .opportunity-card, .research-card {
+    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+  }
+  .opportunity-media img, .research-card > img {
+    transition: transform .6s cubic-bezier(.2,.65,.3,1);
+  }
+  dialog[open] { animation: mainstreet-dialog-enter .25s cubic-bezier(.16,1,.3,1); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .button:hover, .profile-link:hover { transform: translateY(-2px); }
+  .button:active, .profile-link:active { transform: translateY(0); }
+  .opportunity-card:hover, .research-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px -22px #4c2b2845;
+  }
+  .opportunity-card:hover .opportunity-media img,
+  .research-card:hover > img { transform: scale(1.035); }
+}
