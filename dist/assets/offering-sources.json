@@ -1,0 +1,71 @@
+{
+  "checked": "2026-09-13",
+  "notes": "Availability and issuer claims are source snapshots, not endorsements. Rate values are intentionally not summarized: Azure source narrative and structured rate field differ. Confirm governing terms with the platform.",
+  "listings": [
+    {
+      "id": "startengine",
+      "checked": "2026-09-13",
+      "source": "https://invest.startengine.com/",
+      "offeringCircular": "https://www.sec.gov/Archives/edgar/data/1661779/000110465926085115/tm2618104d4_253g2.htm",
+      "investorMinimum": 500.8,
+      "security": "Common stock",
+      "evidence": "Official landing page displays Now Open to the Public and an Invest Now link. Offering circular states minimum 313 shares at $1.60 each.",
+      "imageSource": "https://invest.startengine.com/discover/own/landing-page/assets/howard-marks.webp"
+    },
+    {
+      "slug": "Chainsaw-LA-2",
+      "checked": "2026-09-13",
+      "source": "https://invest.honeycombcredit.com/campaigns/Chainsaw-LA-2",
+      "observedStage": "Fundraising",
+      "offeringDeadline": "2026-09-17",
+      "investorMinimum": 100,
+      "campaignTarget": 124000,
+      "amountInvested": 250,
+      "imageSource": "https://storage.googleapis.com/honeycomb-uploads/uploads/campaignMedia-1786455269735-414808042_tiny.png"
+    },
+    {
+      "slug": "Demitasse-Specialty-Coffee",
+      "checked": "2026-09-13",
+      "source": "https://invest.honeycombcredit.com/campaigns/Demitasse-Specialty-Coffee",
+      "observedStage": "Fundraising",
+      "offeringDeadline": "2026-09-15",
+      "investorMinimum": 100,
+      "campaignTarget": 124000,
+      "amountInvested": 1000,
+      "imageSource": "https://storage.googleapis.com/honeycomb-uploads/uploads/campaignMedia-1786051955767-954613535_tiny.png"
+    },
+    {
+      "slug": "Azure-Printed-Homes",
+      "checked": "2026-09-13",
+      "source": "https://invest.honeycombcredit.com/campaigns/Azure-Printed-Homes",
+      "observedStage": "Fundraising",
+      "offeringDeadline": "2026-09-14",
+      "investorMinimum": 1000,
+      "campaignTarget": 750000,
+      "amountInvested": 13000,
+      "imageSource": "https://storage.googleapis.com/honeycomb-uploads/uploads/campaignMedia-1783456903199-165910816_tiny.png"
+    },
+    {
+      "slug": "Sunpath-Solar",
+      "checked": "2026-09-13",
+      "source": "https://invest.honeycombcredit.com/campaigns/Sunpath-Solar",
+      "observedStage": "Fundraising",
+      "offeringDeadline": "2026-09-21",
+      "investorMinimum": 100,
+      "campaignTarget": 124000,
+      "amountInvested": 24676.76,
+      "imageSource": "https://storage.googleapis.com/honeycomb-uploads/uploads/campaignMedia-1784210918718-907260931_tiny.png"
+    },
+    {
+      "slug": "Jordan-Energy",
+      "checked": "2026-09-13",
+      "source": "https://invest.honeycombcredit.com/campaigns/Jordan-Energy",
+      "observedStage": "Fundraising",
+      "offeringDeadline": "2026-10-29",
+      "investorMinimum": 100,
+      "campaignTarget": 124000,
+      "amountInvested": 12011,
+      "imageSource": "https://storage.googleapis.com/honeycomb-uploads/uploads/campaignMedia-1787066080964-726684036_tiny.png"
+    }
+  ]
+}
