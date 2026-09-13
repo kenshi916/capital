@@ -95,7 +95,7 @@ $('#view-watchlist').addEventListener('click',()=>{state.filter='Watchlist';stat
 ['about-button','footer-about'].forEach(id=>$(`#${id}`).addEventListener('click',()=>$('#about-dialog').showModal()));
 ['ledger-button','all-activity-button'].forEach(id=>$(`#${id}`).addEventListener('click',()=>$('#ledger-dialog').showModal()));
 document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}}));
-function routeFromHash(){const raw=location.hash.slice(1),hash=raw==='docs'||raw.startsWith('docs/')?'docs':raw==='community'||raw.startsWith('community/')?'community':raw;if(hash==='main'&&document.body.dataset.view)return;setView((hash==='main'?'':hash)||(new URL(location.href).searchParams.has('treasury')?'treasury':'home'));}
+function routeFromHash(){const raw=location.hash.slice(1),hash=raw==='treasury/test'?'treasury':raw==='docs'||raw.startsWith('docs/')?'docs':raw==='community'||raw.startsWith('community/')?'community':raw;if(hash==='main'&&document.body.dataset.view)return;if(raw==='treasury/test'||hash==='treasury'&&new URL(location.href).searchParams.has('treasury'))$('#treasury-test-tools').open=true;setView((hash==='main'?'':hash)||(new URL(location.href).searchParams.has('treasury')?'treasury':'home'));}
 window.addEventListener('hashchange',routeFromHash);
 renderSectors();renderCompanies();renderWatchlist();routeFromHash();
 
