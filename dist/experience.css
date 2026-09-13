@@ -161,3 +161,14 @@ html[data-theme=dark] .launch-network-details .launch-route{background:transpare
 @media(max-width:600px){#view-explore>.workspace-heading{gap:12px!important;align-items:flex-start!important}#view-explore>.workspace-heading h1,#view-launch .launch-heading h1{font-size:1.75rem!important}#view-explore>.workspace-heading>.text-button{font-size:.8125rem}#view-launch .launch-heading{flex-direction:row!important;align-items:flex-start!important;gap:16px!important}#view-launch .launch-heading>div>p:last-child{font-size:.8125rem!important;max-width:220px}.launch-draft-tools>summary{font-size:.75rem;padding:10px}.launch-fields{grid-template-columns:1fr}.launch-editor{padding:21px 18px}.launch-status-strip{gap:8px}.launch-layout{margin-top:14px}.launch-sidebar nav button{font-size:.6875rem;padding:9px 3px;min-height:48px}.launch-editor-heading>p:last-child{font-size:.875rem}.business-strip.opportunity-card{padding:18px;gap:14px}.business-strip h3{font-size:1.0625rem!important}.business-copy>p{font-size:.8125rem}.business-security,.business-minimum{padding-top:10px}.business-actions{padding-top:2px}.directory-heading h2{font-size:1rem}.directory-heading p{font-size:.75rem}.catalog-context,.equity-explain-link{font-size:.75rem!important}.catalog-footnote{font-size:.75rem}.treasury-action-bar .chain-address{font-size:.6875rem}.treasury-action-bar .metadata{font-size:.6875rem}.treasury-admin-tools>summary{font-size:.75rem;padding:9px 11px}.positions-panel .panel-heading .text-button{font-size:.6875rem}}
 
 @media(max-width:600px){#view-explore>.workspace-heading{flex-direction:row!important;flex-wrap:wrap}.sector-menu>summary{max-width:190px;overflow:hidden;text-overflow:ellipsis}.sort-box select{max-width:125px}}
+
+/* Keep setup controls within Treasury tools, away from the page heading. */
+.prototype-notice[hidden]{display:none!important}
+.treasury-admin-tools>.chain-button-row{min-width:240px;max-width:calc(100vw - 36px)}
+.treasury-admin-tools .chain-toolbar{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin:0 0 4px;padding:0 0 12px;border:0;border-bottom:1px solid var(--border);background:transparent}
+.treasury-admin-tools .chain-network{display:grid;gap:7px;min-width:0}
+.treasury-admin-tools .chain-network label{display:block;font-size:.75rem;color:var(--muted)}
+.treasury-admin-tools .chain-network select{width:100%;max-width:none;font-size:.8125rem}
+.treasury-admin-tools #chain-status{display:none}
+.treasury-admin-tools .chain-tools{display:flex;justify-content:space-between;gap:10px}
+.treasury-admin-tools .chain-tools .text-button{font-size:.8125rem}
