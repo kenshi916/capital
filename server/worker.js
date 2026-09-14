@@ -3,6 +3,7 @@ import {AppError,requireValue,now,hash,normalizeRound,checkPublication,statusOf,
 import * as chain from './snapshot.js';
 import companies from './companies.json';
 import {forum} from './forum.js';
+import {readFundBalance} from './fund.js';
 const uid=()=>crypto.randomUUID();
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}});
 const statement=(db,sql,...args)=>db.prepare(sql).bind(...args);
@@ -42,6 +43,7 @@ export function createApp(dependencies={}){
  }
  return {async fetch(request,env,ctx){
   const path=new URL(request.url).pathname;
+  if(path==='/api/fund/balance')return readFundBalance(request,env,dependencies.fundFetch||fetch);
   const isForum=path.startsWith('/api/forum/');
   if(!isForum&&!path.startsWith('/api/voting/')){if(env.ASSETS)return env.ASSETS.fetch(request);return new Response('Not found',{status:404});}
   try{

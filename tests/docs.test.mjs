@@ -5,7 +5,7 @@ import {JSDOM} from 'jsdom';
 function page(route){
  const dom=new JSDOM(fs.readFileSync('dist/index.html','utf8'),{url:'https://example.com/'+route,runScripts:'outside-only',pretendToBeVisual:true});const w=dom.window;w.scrollTo=()=>{};
  w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
- w.eval(['opportunities','app','docs'].map(name=>fs.readFileSync(`dist/${name}.js`,'utf8')).join('\n'));return dom;
+ w.eval(['opportunities','app','portfolio-explorer','docs'].map(name=>fs.readFileSync(`dist/${name}.js`,'utf8')).join('\n'));return dom;
 }
 const chapters=['overview','ownership','treasury','distributions','wallet','faq'];
 test('docs deep links resolve to one readable chapter and keep the main navigation active',()=>{

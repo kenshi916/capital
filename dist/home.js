@@ -3,15 +3,16 @@
   const control = document.getElementById('home-motion');
   const featureControl = document.getElementById('home-features-motion');
   const home = document.getElementById('view-home');
-  const { opportunities, escapeHtml: esc } = window.MainstreetDirectory;
+  const { escapeHtml: esc } = window.MainstreetDirectory;
+  const opportunities = window.CapitalFund.companies;
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
   let paused = !!reducedMotion?.matches;
   const groups = [[], [], []];
   opportunities.forEach((company, index) => groups[index % 3].push(company));
-  const card = (company, duplicate) => `<button class="home-company" type="button" data-opportunity="${esc(company.id)}" aria-label="Explore ${esc(company.name)}"${duplicate ? ' tabindex="-1"' : ''}><img src="${esc(company.image)}" alt="" width="220" height="144" decoding="async" style="object-fit:${company.imageFit || 'cover'};object-position:${company.imagePosition || 'center'}"><span class="home-company-name">${esc(company.name)}<span aria-hidden="true">↗</span></span></button>`;
+  const card = (company, duplicate) => `<button class="home-company" type="button" data-exposure-company="${esc(company.id)}" aria-label="Explore ${esc(company.name)}"${duplicate ? ' tabindex="-1"' : ''}><span class="home-company-art">${window.CapitalFund.icon(company)}</span><span class="home-company-name">${esc(company.name)}<span aria-hidden="true">↗</span></span></button>`;
   wall.innerHTML = groups.map((companies, index) => `<div class="company-lane lane-${index + 1}"><div class="company-track"><div class="company-track-set">${companies.map(c => card(c, false)).join('')}</div><div class="company-track-set" aria-hidden="true">${companies.map(c => card(c, true)).join('')}</div></div></div>`).join('');
-  const featured=['miso-robotics','animoca-brands','atombeam','greenfield-robotics','chatrx'].map(id=>opportunities.find(c=>c.id===id)).filter(Boolean);
-  const featureChip=c=>`<span class="discovery-chip"><img src="${esc(c.image)}" alt="" width="46" height="46" loading="lazy" style="object-fit:${c.imageFit||'cover'};object-position:${c.imagePosition||'center'}"><span><strong>${esc(c.name)}</strong><small>${esc(c.category)}</small></span></span>`;
+  const featured=['loyal','figure','gumloop','inspectify','ditto'].map(id=>opportunities.find(c=>c.id===id)).filter(Boolean);
+  const featureChip=c=>`<span class="discovery-chip"><img src="${esc(c.image)}" alt="" width="46" height="46" loading="lazy" style="object-fit:${'contain'};object-position:${c.imagePosition||'center'}"><span><strong>${esc(c.name)}</strong><small>${esc(c.category)}</small></span></span>`;
   document.getElementById('feature-company-track').innerHTML=[0,1].map(()=>`<div class="discovery-set">${featured.map(featureChip).join('')}</div>`).join('');
   document.getElementById('feature-shortlist-rows').innerHTML=featured.slice(0,3).map((c,i)=>`<div class="shortlist-row feature-animated" style="--row:${i}"><img src="${esc(c.image)}" alt="" width="30" height="30" loading="lazy"><strong>${esc(c.name)}</strong><span>↗</span></div>`).join('');
   function update() {
