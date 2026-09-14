@@ -1,0 +1,6 @@
+import {startupFund as fund} from './portfolio-model.js';
+import {escapeHTML as esc} from './chain-utils.js';
+
+export function otherFundAssets(){
+ return `<details class="fund-other-assets"><summary><span>Other fund assets</span><small>Debt & cash management · ${fund.otherAssets.length} holdings groups</small><span aria-hidden="true">⌄</span></summary><p class="fund-note">These are debt and short-term fund investments, separate from the company equity above.</p><div class="fund-other-grid">${fund.otherAssets.map(a=>`<article class="fund-other-row" data-fund-asset="${esc(a.id)}"><div><span class="fund-other-category">${esc(a.category)}</span><h4><a href="${esc(a.website)}" target="_blank" rel="noopener noreferrer">${esc(a.name)} ↗</a></h4><p>${esc(a.description)}</p></div><div class="fund-other-weight"><strong>${esc(a.weight)}</strong><small>of fund net assets</small></div></article>`).join('')}</div><p class="fund-note">Reported June 30, 2026. Weights are rounded; QTS combines five debt positions. The fund also reports 3.9% in other assets net of liabilities. These are fund-level exposures, not separate holder balances or claimable company shares. <a href="${esc(fund.holdingsUrl)}" target="_blank" rel="noopener noreferrer">View the full investment schedule ↗</a></p></details>`;
+}

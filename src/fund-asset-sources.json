@@ -1,0 +1,56 @@
+[
+  {
+    "id": "anyscale",
+    "page": "https://www.anyscale.com",
+    "image": "https://www.anyscale.com/static/favicon-new.ico",
+    "checkedAt": "2026-09-14"
+  },
+  {
+    "id": "handshake",
+    "page": "https://joinhandshake.com",
+    "image": "https://joinhandshake.com/icons/icon-180.png",
+    "checkedAt": "2026-09-14"
+  },
+  {
+    "id": "fin",
+    "page": "https://fin.ai",
+    "image": "https://fin.ai/favicons/favicon-black-96x96.png",
+    "checkedAt": "2026-09-14"
+  },
+  {
+    "id": "risotto",
+    "page": "https://www.tryrisotto.com",
+    "image": "https://cdn.prod.website-files.com/687df3ce131ebdf359c40fc7/68ac0dc3841ad130bcd661b6_Webclip%20(2)%20(1).svg",
+    "checkedAt": "2026-09-14"
+  },
+  {
+    "id": "stripe",
+    "page": "https://stripe.com",
+    "image": "https://images.stripeassets.com/fzn2n1nzq965/4vVgZi0ZMoEzOhkcv7EVwK/8cce6fdcf2733b2ec8e99548908847ed/favicon.png?w=180&h=180",
+    "checkedAt": "2026-09-14"
+  },
+  {
+    "id": "luminos",
+    "page": "https://www.luminos.ai",
+    "image": "https://cdn.prod.website-files.com/65a82212637018fb2b0761fc/65a8346053343f49bf76658e_luminos-ai-favicon-256x256.png",
+    "checkedAt": "2026-09-14"
+  },
+  {
+    "id": "rhino",
+    "page": "https://www.sayrhino.com",
+    "image": "https://www.sayrhino.com/assets/brand/rhino/favicon-144-b7265da417b6731f322eeccf89a6313a3387099dd046a807b4cabe32db0d228e.png",
+    "checkedAt": "2026-09-14"
+  },
+  {
+    "id": "prometheus",
+    "page": "https://www.prometheus.ai",
+    "image": "https://www.prometheus.ai/favicon.png",
+    "checkedAt": "2026-09-14"
+  },
+  {
+    "id": "erebor",
+    "page": "https://erebor.bank",
+    "image": "https://erebor.bank/apple-touch-icon.png",
+    "checkedAt": "2026-09-14"
+  }
+]

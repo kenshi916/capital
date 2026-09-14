@@ -33,8 +33,8 @@ test('home gallery respects reduced motion and opens company profiles', () => {
   assert.match(q('#home-features-motion').textContent,/Play animations/);
   assert.match(q('#home-motion').textContent,/Play animation/);
   const originals=[...w.document.querySelectorAll('.company-track-set:not([aria-hidden]) .home-company')];
-  assert.equal(originals.length,20);
-  assert.equal(new Set(originals.map(e=>e.dataset.exposureCompany)).size,20);
+  assert.equal(originals.length,29);
+  assert.equal(new Set(originals.map(e=>e.dataset.exposureCompany)).size,29);
   for(const e of w.document.querySelectorAll('.company-track-set[aria-hidden] button')) assert.equal(e.tabIndex,-1);
   originals[0].click(); assert.equal(q('#fund-dialog').open,true); assert.match(q('#fund-dialog-title').textContent,/Loyal/);
   q('#home-motion').click(); assert.equal(q('#home-company-wall').dataset.paused,'false');
@@ -54,15 +54,24 @@ test('home gallery respects reduced motion and opens company profiles', () => {
 
 test('fund search and niches retain indirect exposure labels and cannot activate unfunded claims',()=>{
  const dom=page('/#explore'),w=dom.window,q=s=>w.document.querySelector(s);
- q('#fund-niche').click();assert.equal(w.document.querySelectorAll('.fund-company-row').length,12);
+ q('#fund-niche').click();assert.equal(w.document.querySelectorAll('.fund-company-row').length,20);
  q('#fund-search').value='dogs';q('#fund-search').dispatchEvent(new w.Event('input'));
  assert.equal(w.document.querySelectorAll('.fund-company-row').length,1);
  q('.fund-company-main').click();assert.match(q('#fund-dialog').textContent,/indirect fund exposure/);
  assert.equal(q('#fund-dialog a').href,'https://loyal.com/');
  q('#fund-search').value='no matching company';q('#fund-search').dispatchEvent(new w.Event('input'));q('#fund-clear').click();
- assert.equal(w.document.querySelectorAll('.fund-company-row').length,20);
+ assert.equal(w.document.querySelectorAll('.fund-company-row').length,29);
  assert.equal(q('.fund-claim-button').disabled,true);assert.match(q('#vcxx-balance').textContent,/—/);
- assert.equal(q('#portfolio-test-tools').open,false);dom.window.close();
+ assert.equal(q('#portfolio-test-tools').open,false);
+ for(const id of ['prometheus','anyscale','handshake','fin','risotto','luminos','erebor','stripe','rhino']){
+  const row=q(`#fund-companies [data-exposure-company=${id}]`);assert.ok(row,id);row.click();assert.ok(q('#fund-dialog a').href.startsWith('https://'));
+ }
+ for(const container of ['#fund-directory','#portfolio-exposure']){
+  const other=q(container+' .fund-other-assets');assert.equal(other.open,false);other.querySelector('summary').click();assert.equal(other.open,true);
+  assert.equal(other.querySelectorAll('[data-fund-asset]').length,6);assert.equal(other.querySelectorAll('[data-exposure-company]').length,0);
+  assert.match(other.textContent,/Data-center debt/);assert.match(other.textContent,/Cash management/);assert.match(other.textContent,/June 30, 2026/);
+ }
+ dom.window.close();
 });
 
 test('portfolio ignores stale balance responses when the connected wallet changes',async()=>{
@@ -81,7 +90,7 @@ test('portfolio ignores stale balance responses when the connected wallet change
 test('portfolio shows compact fund rows with an expandable, dated company breakdown',()=>{
  const dom=page('/#holdings'),w=dom.window,q=s=>w.document.querySelector(s);
  const rows=[...w.document.querySelectorAll('#portfolio-exposure .portfolio-exposure-row')];
- assert.equal(rows.length,20);assert.equal(new Set(rows.map(e=>e.dataset.exposureCompany)).size,20);
+ assert.equal(rows.length,29);assert.equal(new Set(rows.map(e=>e.dataset.exposureCompany)).size,29);
  assert.equal(w.document.querySelectorAll('#portfolio-exposure>.portfolio-exposure-grid .portfolio-exposure-row').length,6);
  assert.equal(q('#portfolio-exposure-more').open,false);q('#portfolio-exposure-more summary').click();assert.equal(q('#portfolio-exposure-more').open,true);
  q('#portfolio-exposure-more [data-exposure-company=anthropic]').click();assert.match(q('#fund-dialog-title').textContent,/Anthropic/);assert.match(q('#fund-dialog').textContent,/indirect fund exposure/i);
@@ -101,6 +110,6 @@ test('portfolio company context distinguishes a verified zero from an unavailabl
  // No wallet adapter in this fixture; a new account event drives the failed read.
  wallet('0x0000000000000000000000000000000000000001');await new Promise(r=>setTimeout(r,0));
  assert.equal(q('#portfolio-exposure').dataset.balanceState,'unavailable');assert.doesNotMatch(q('#portfolio-exposure-status').textContent,/No VCXx detected|verified in/);assert.match(q('#vcxx-balance').textContent,/—/);
- assert.equal(q('.fund-claim-button').disabled,true);assert.equal(w.document.querySelectorAll('.portfolio-exposure-row').length,20);
+ assert.equal(q('.fund-claim-button').disabled,true);assert.equal(w.document.querySelectorAll('.portfolio-exposure-row').length,29);
  }finally{w.close();}
 });
