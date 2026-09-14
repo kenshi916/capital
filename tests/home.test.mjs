@@ -74,5 +74,33 @@ test('portfolio ignores stale balance responses when the connected wallet change
  pending[1]({ok:true,json:async()=>({balance:'3.5',block:200})});await new Promise(r=>setTimeout(r,0));
  pending[0]({ok:true,json:async()=>({balance:'99',block:100})});await new Promise(r=>setTimeout(r,0));
  assert.match(q('#vcxx-balance').textContent,/3.5/);assert.match(q('#vcxx-balance-status').textContent,/0002/);
- wallet(null);assert.match(q('#vcxx-balance').textContent,/—/);assert.equal(q('#vcxx-wallet-link').hidden,true);dom.window.close();
+ assert.equal(q('#portfolio-exposure').dataset.balanceState,'held');assert.match(q('#portfolio-exposure-status').textContent,/3.5 VCXx verified/);assert.doesNotMatch(q('#portfolio-exposure-status').textContent,/99|claimed|received from Capital/i);
+ wallet(null);assert.match(q('#vcxx-balance').textContent,/—/);assert.equal(q('#vcxx-wallet-link').hidden,true);assert.equal(q('#portfolio-exposure').dataset.balanceState,'disconnected');assert.doesNotMatch(q('#portfolio-exposure-status').textContent,/3.5/);dom.window.close();
+});
+
+test('portfolio shows compact fund rows with an expandable, dated company breakdown',()=>{
+ const dom=page('/#holdings'),w=dom.window,q=s=>w.document.querySelector(s);
+ const rows=[...w.document.querySelectorAll('#portfolio-exposure .portfolio-exposure-row')];
+ assert.equal(rows.length,20);assert.equal(new Set(rows.map(e=>e.dataset.exposureCompany)).size,20);
+ assert.equal(w.document.querySelectorAll('#portfolio-exposure>.portfolio-exposure-grid .portfolio-exposure-row').length,6);
+ assert.equal(q('#portfolio-exposure-more').open,false);q('#portfolio-exposure-more summary').click();assert.equal(q('#portfolio-exposure-more').open,true);
+ q('#portfolio-exposure-more [data-exposure-company=anthropic]').click();assert.match(q('#fund-dialog-title').textContent,/Anthropic/);assert.match(q('#fund-dialog').textContent,/indirect fund exposure/i);
+ assert.equal(q('#portfolio-exposure time').dateTime,'2026-06-30');assert.match(q('.portfolio-exposure-note').textContent,/not individual company shares or payout allocations/);
+ assert.match(q('.portfolio-exposure-note a').href,/sec.gov/);assert.equal(q('.fund-claim-button').disabled,true);
+ assert.equal(q('#portfolio-exposure').dataset.balanceState,'disconnected');assert.match(q('#portfolio-exposure-status').textContent,/fund information/);
+ q('#portfolio-exposure-more summary').click();assert.equal(q('#portfolio-exposure-more').open,false);dom.window.close();
+});
+
+test('portfolio company context distinguishes a verified zero from an unavailable balance',async()=>{
+ const dom=page('/#holdings'),w=dom.window,q=s=>w.document.querySelector(s);
+ try{const wallet=account=>w.document.dispatchEvent(new w.CustomEvent('mainstreet:wallet',{detail:{account}}));
+ w.fetch=async()=>({ok:true,json:async()=>({balance:'0',block:300})});wallet('0x0000000000000000000000000000000000000001');
+ assert.equal(q('#portfolio-exposure').dataset.balanceState,'loading');await new Promise(r=>setTimeout(r,0));
+ assert.equal(q('#portfolio-exposure').dataset.balanceState,'empty');assert.match(q('#portfolio-exposure-status').textContent,/No VCXx detected/);
+ w.fetch=async()=>({ok:false,json:async()=>({error:'RPC unavailable'})});q('#vcxx-refresh').click();await new Promise(r=>setTimeout(r,0));
+ // No wallet adapter in this fixture; a new account event drives the failed read.
+ wallet('0x0000000000000000000000000000000000000001');await new Promise(r=>setTimeout(r,0));
+ assert.equal(q('#portfolio-exposure').dataset.balanceState,'unavailable');assert.doesNotMatch(q('#portfolio-exposure-status').textContent,/No VCXx detected|verified in/);assert.match(q('#vcxx-balance').textContent,/—/);
+ assert.equal(q('.fund-claim-button').disabled,true);assert.equal(w.document.querySelectorAll('.portfolio-exposure-row').length,20);
+ }finally{w.close();}
 });
