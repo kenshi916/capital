@@ -1,5 +1,6 @@
 import { BrowserProvider, JsonRpcProvider, FetchRequest, Contract, ContractFactory, formatEther, sha256, toUtf8Bytes, getAddress } from 'ethers';
 import { escapeHTML as esc, safeURL, amount, dollars, exactDollars, address, shortAddress, sameContract } from './chain-utils.js';
+import {isMetaMaskProvider} from './wallet-provider.js';
 
 const $ = s => document.querySelector(s);
 const providers = new Map();
@@ -57,22 +58,21 @@ function renderWalletOptions() {
   const box = $('#chain-wallet-options');
   const mobileURL = ['localhost','127.0.0.1'].includes(location.hostname) ? `mainstreet-equity.kenshipops.chatgpt.site/${location.search}${location.hash}` : `${location.host}${location.pathname}${location.search}${location.hash}`;
   $('#chain-mobile-wallet').href = `https://link.metamask.io/dapp/${mobileURL}`;
-  const isMetaMask = p => ['io.metamask','io.metamask.mobile','io.metamask.flask'].includes(p.info.rdns) || p.provider.isMetaMask;
-  const entries = [...providers], meta = entries.find(([, p]) => isMetaMask(p));
-  box.innerHTML = `<button class="chain-wallet-option metamask-option" data-wallet-provider="${esc(meta?.[0] || 'metamask-connect')}" ${connecting ? 'disabled' : ''}><img src="/assets/metamask.svg" alt="" width="40" height="40"><span><strong>MetaMask</strong><small>${connecting ? 'Waiting for wallet approval…' : meta ? 'Connect your browser wallet' : 'Connect with mobile QR or browser extension'}</small></span><span aria-hidden="true">↗</span></button>` + entries.filter(([,p])=>!isMetaMask(p)).map(([id,p])=>`<button class="chain-wallet-option" data-wallet-provider="${esc(id)}" ${connecting ? 'disabled' : ''}><span>${esc(p.info.name)}</span><span>Connect ↗</span></button>`).join('');
+  const meta = [...providers].find(([, p]) => isMetaMaskProvider(p,window.phantom?.ethereum));
+  box.innerHTML = `<button class="chain-wallet-option metamask-option" data-wallet-provider="${esc(meta?.[0] || 'metamask-connect')}" ${connecting ? 'disabled' : ''}><img src="/assets/metamask.svg" alt="" width="40" height="40"><span><strong>MetaMask</strong><small>${connecting ? 'Waiting for MetaMask approval…' : meta ? 'Connect your MetaMask extension' : 'Connect with MetaMask mobile QR or extension'}</small></span><span aria-hidden="true">↗</span></button>`;
   $('#chain-connected-wallet').hidden = !state.account;
   if (state.account) $('#chain-connected-wallet').innerHTML = `<div class="chain-inline-note"><strong>Connected wallet</strong><p class="chain-address">${esc(state.account)}</p><button class="text-button" id="chain-disconnect">Disconnect from this page</button></div>`;
 }
 function announce(event) {
   const d = event.detail;
-  if (!d?.provider?.request || !d.info?.uuid) return;
+  if (!isMetaMaskProvider(d,window.phantom?.ethereum) || typeof d.info?.uuid!=='string' || !d.info.uuid || d.info.uuid==='metamask-connect') return;
   providers.set(d.info.uuid, { info: { name: String(d.info.name).slice(0, 60), rdns: String(d.info.rdns || '') }, provider: d.provider });
   renderWalletOptions();
 }
 function registerProviders() {
   window.addEventListener('eip6963:announceProvider', announce);
   window.dispatchEvent(new Event('eip6963:requestProvider'));
-  if (window.ethereum?.request && ![...providers.values()].some(p => p.provider === window.ethereum)) providers.set('injected', { info: { name: window.ethereum.isMetaMask ? 'MetaMask' : 'Browser wallet' }, provider: window.ethereum });
+  // No window.ethereum fallback: another wallet may own it, even with isMetaMask set.
   renderWalletOptions();
 }
 function detachProviderListeners() {
@@ -83,7 +83,7 @@ function detachProviderListeners() {
 async function connect(id) {
   if (connecting) throw new Error('A connection request is already open. Finish it in MetaMask.');
   let selected = providers.get(id);
-  if (!selected && id !== 'metamask-connect') throw new Error('Choose an installed wallet.');
+  if (id !== 'metamask-connect' && !isMetaMaskProvider(selected,window.phantom?.ethereum)) throw new Error('Capital connects to MetaMask only. Choose MetaMask or use its mobile connection.');
   if (state.busy) throw new Error('Finish the current transaction first.');
   const sequence = ++connectionSequence;
   connecting = true; renderWalletOptions();

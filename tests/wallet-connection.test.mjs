@@ -4,13 +4,14 @@ import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
 const read = p => fs.readFileSync(p,'utf8');
 async function until(fn) { for(let i=0;i<100;i++) { if(fn()) return; await new Promise(r=>setTimeout(r,10)); } throw new Error('Expected wallet state did not arrive'); }
-function setup({provider,failConfig=false}={}) {
+function setup({provider,announcements=provider?[{provider,info:{uuid:'metamask',rdns:'io.metamask',name:'MetaMask'}}]:[],failConfig=false}={}) {
   const dom = new JSDOM(read('dist/index.html'),{url:'https://mainstreet-equity.kenshipops.chatgpt.site/#launch',runScripts:'outside-only',pretendToBeVisual:true});
   const w=dom.window;
   w.TextEncoder=TextEncoder;w.TextDecoder=TextDecoder;w.Response=Response;w.Request=Request;w.scrollTo=()=>{};
   w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
   w.fetch=async url=> {if(failConfig) throw new Error('Configuration unavailable'); return new Response(read(String(url).startsWith('/deployment')?'dist/deployment.json':'dist/contracts/artifacts.json'));};
   if(provider) w.ethereum=provider;
+  w.addEventListener('eip6963:requestProvider',()=>{for(const detail of announcements)w.dispatchEvent(new w.CustomEvent('eip6963:announceProvider',{detail}));});
   w.eval(read('dist/opportunities.js')+'\n'+read('dist/app.js'));w.eval(read('dist/chain.js'));
   return dom;
 }
@@ -33,13 +34,44 @@ test('connection is single-flight, rejects cleanly, and works even when treasury
   const dom=setup({provider,failConfig:true});try{
     const w=dom.window,q=s=>w.document.querySelector(s);
     await until(()=>q('#chain-status').textContent==='Setup needs attention');
-    q('#wallet-button').click();q('[data-wallet-provider="injected"]').click();await until(()=>count===1);
-    assert(q('[data-wallet-provider="injected"]').disabled);q('[data-wallet-provider="injected"]').click();assert.equal(count,1);
+    q('#wallet-button').click();q('[data-wallet-provider="metamask"]').click();await until(()=>count===1);
+    assert(q('[data-wallet-provider="metamask"]').disabled);q('[data-wallet-provider="metamask"]').click();assert.equal(count,1);
     rejectRequest(Object.assign(new Error('Rejected'),{code:4001}));await until(()=>q('#toast').textContent.includes('cancelled'));
-    assert(!q('[data-wallet-provider="injected"]').disabled);
-    q('[data-wallet-provider="injected"]').click();await until(()=>count===2);resolveRequest(['0x1234567890123456789012345678901234567890']);
+    assert(!q('[data-wallet-provider="metamask"]').disabled);
+    q('[data-wallet-provider="metamask"]').click();await until(()=>count===2);resolveRequest(['0x1234567890123456789012345678901234567890']);
     await until(()=>q('#wallet-button span').textContent.startsWith('0x'));
     assert(!q('#wallet-dialog').open);assert.equal(q('#chain-holder-wallet').textContent,'0x1234567890123456789012345678901234567890');
     assert(q('#chain-deploy').disabled,'Unavailable treasury artifacts must not enable deployment after connection');
   }finally{dom.window.close();}
+});
+test('Phantom and unverified injected wallets never appear as MetaMask or receive account requests',async()=>{
+ for(const phantomFlags of [{isMetaMask:true,isPhantom:true},{isMetaMask:true},{}]){
+  let calls=0;const provider={...phantomFlags,request(){calls++;throw Error('Wrong wallet was contacted');}};
+  const dom=setup({provider,announcements:[{provider,info:{uuid:'phantom',rdns:'app.phantom',name:'Phantom'}}]});
+  try{const w=dom.window,q=s=>w.document.querySelector(s);await until(()=>w.document.documentElement.dataset.chainApp==='ready');q('#wallet-button').click();
+   assert.equal(w.document.querySelectorAll('[data-wallet-provider]').length,1);assert(q('[data-wallet-provider="metamask-connect"]'));assert.doesNotMatch(q('#chain-wallet-options').textContent,/Phantom|Browser wallet/);
+   // A stale/custom DOM option still cannot bypass the connection guard.
+   const old=w.document.createElement('button');old.dataset.walletProvider='phantom';w.document.body.append(old);old.click();await until(()=>q('#toast').textContent.includes('MetaMask only'));assert.equal(calls,0);
+  }finally{dom.window.close();}
+ }
+ const unannounced={isMetaMask:true,request(){throw Error('Raw window.ethereum must not be used');}};
+ const dom=setup({provider:unannounced,announcements:[]});try{await until(()=>dom.window.document.documentElement.dataset.chainApp==='ready');assert(dom.window.document.querySelector('[data-wallet-provider="metamask-connect"]'));assert.equal(dom.window.document.querySelector('[data-wallet-provider="injected"]'),null);}finally{dom.window.close();}
+});
+
+test('MetaMask connects when Phantom owns window.ethereum, regardless of announcement order',async()=>{
+ for(const reverse of [false,true]){
+  let phantomCalls=0,metamaskCalls=0;
+  const phantom={isMetaMask:true,isPhantom:true,request(){phantomCalls++;throw Error('Wrong wallet');}};
+  const metamask={isMetaMask:true,request:async({method})=>{if(method==='eth_requestAccounts'){metamaskCalls++;return ['0x1234567890123456789012345678901234567890'];}if(method==='eth_chainId')return '0xb626';throw Error(method);},on(){},removeListener(){}};
+  const announcements=[{provider:phantom,info:{uuid:'phantom',rdns:'app.phantom',name:'Phantom'}},{provider:metamask,info:{uuid:'metamask',rdns:'io.metamask',name:'MetaMask'}}];if(reverse)announcements.reverse();
+  const dom=setup({provider:phantom,announcements,failConfig:true});try{const q=s=>dom.window.document.querySelector(s);await until(()=>q('#chain-status').textContent==='Setup needs attention');q('#wallet-button').click();assert.equal(dom.window.document.querySelectorAll('[data-wallet-provider]').length,1);q('[data-wallet-provider="metamask"]').click();await until(()=>q('#wallet-button span').textContent.startsWith('0x'));assert.equal(metamaskCalls,1);assert.equal(phantomCalls,0);}finally{dom.window.close();}
+ }
+});
+
+test('late MetaMask announcement replaces the QR fallback, while a Phantom provider using its rdns is rejected',async()=>{
+ const dom=setup();try{const w=dom.window,q=s=>w.document.querySelector(s);await until(()=>w.document.documentElement.dataset.chainApp==='ready');
+  const spoof={request(){throw Error('Wrong wallet');},isPhantom:true};w.dispatchEvent(new w.CustomEvent('eip6963:announceProvider',{detail:{provider:spoof,info:{uuid:'spoof',rdns:'io.metamask',name:'MetaMask'}}}));assert(q('[data-wallet-provider="metamask-connect"]'));
+  const provider={request(){}};w.dispatchEvent(new w.CustomEvent('eip6963:announceProvider',{detail:{provider,info:{uuid:'late',rdns:'io.metamask.mobile',name:'MetaMask'}}}));assert(q('[data-wallet-provider="late"]'));assert.equal(w.document.querySelectorAll('[data-wallet-provider]').length,1);
+  w.phantom={ethereum:provider};q('#wallet-button').click();assert(q('[data-wallet-provider="metamask-connect"]'));
+ }finally{dom.window.close();}
 });

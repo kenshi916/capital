@@ -58,12 +58,13 @@ test('published UI completes wallet deployment, fee deposit, purchase, payment, 
       },
       on(name, listener) { listeners.set(name, listener); }, removeListener(name) { listeners.delete(name); }
     };
+    w.addEventListener('eip6963:requestProvider',()=>w.dispatchEvent(new w.CustomEvent('eip6963:announceProvider',{detail:{info:{uuid:'metamask',rdns:'io.metamask',name:'MetaMask'},provider:w.ethereum}})));
     w.eval(read('dist/opportunities.js') + '\n' + read('dist/app.js')); w.eval(read('dist/chain.js'));
     await waitFor(() => w.document.documentElement.dataset.chainApp === 'ready', 'Application did not initialize');
     assert.equal(w.document.querySelectorAll('.opportunity-card').length, 19);
     assert.equal(w.document.querySelector('#total-assets').textContent, '—', 'A disconnected page must not show fictional balances');
     w.document.querySelector('#wallet-button').click();
-    w.document.querySelector('[data-wallet-provider="injected"]').click();
+    w.document.querySelector('[data-wallet-provider="metamask"]').click();
     await waitFor(() => w.document.querySelector('#wallet-button span').textContent.startsWith('0x'), 'Wallet did not connect');
     w.document.querySelector('#chain-deploy').click();
     await waitFor(() => w.document.querySelector('#chain-treasury-address').textContent.includes('Administrator'), 'Test suite deployment did not complete: ' + w.document.querySelector('#toast').textContent);
