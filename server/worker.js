@@ -80,7 +80,7 @@ export function createApp(dependencies={}){
     }
     if(!action&&method==='PUT'){
      requireValue(auth.admin,'Only the administrator can edit rounds.',403);requireValue(r.status==='draft','Published terms are fixed. Create a new revision to change them.',409);
-     const input=await readBody(request),p=normalizeRound(input,companies);requireValue(input.version===r.version,'This draft changed. Reload it before saving.',409);const op=uid();
+     const input=await readBody(request),p=normalizeRound(input,companies);requireValue(p.kind===payload(r).kind,'A draft cannot change between company research and treasury policy.',409);requireValue(input.version===r.version,'This draft changed. Reload it before saving.',409);const op=uid();
      const response=await db.batch([statement(db,"UPDATE capital_rounds SET payload=?,opens_at=?,closes_at=?,version=version+1,mutation_id=?,updated_at=? WHERE id=? AND version=? AND status='draft'",JSON.stringify(p),p.opensAt,p.closesAt,op,now(),id,input.version),auditStatement(db,op,id,'draft-edited',auth.user,{termsHash:hash(p)})]);
      requireValue(response[0].meta.changes===1,'This draft changed. Reload it before saving.',409);return json({round:await serializeRound(db,await getRound(db,id,auth),true)});
     }

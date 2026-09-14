@@ -8,11 +8,11 @@ test('leaderboard supports searching, shared picks, focus preservation, failure 
  w.fetch=async(url,options={})=>{if(url.endsWith('/company-interest')){if(options.method==='POST'){sends.push(JSON.parse(options.body));if(fail)throw Error('Connection lost');saved=sends.at(-1).companyId;version++;}return response(snapshot());}if(url.endsWith('/session'))return response({signedIn:true,author:'Member abc',isAdmin:false});return response({messages:[],hasMore:false,nextBefore:null});};
  const flush=async()=>{for(let i=0;i<40;i++)await Promise.resolve();};
  try{
-  w.eval(['opportunities','app','forum'].map(n=>fs.readFileSync('dist/'+n+'.js','utf8')).join('\n'));await flush();assert.equal(q('#interest-list').children.length,5);assert.match(q('#interest-summary').textContent,/No picks yet/);
+  q('#legacy-interest').open=true;w.eval(['opportunities','app','forum'].map(n=>fs.readFileSync('dist/'+n+'.js','utf8')).join('\n'));await flush();assert.equal(q('#interest-list').children.length,5);assert.match(q('#interest-summary').textContent,/No picks yet/);
   q('#interest-more').click();assert.equal(q('#interest-list').children.length,7);q('#interest-search').value='Animoca';q('#interest-search').dispatchEvent(new w.Event('input'));assert.equal(q('#interest-list').children.length,1);
   q('[data-interest-pick="animoca-brands"]').click();await flush();assert.deepEqual(sends[0],{companyId:'animoca-brands',expectedVersion:0});assert.equal(q('[data-interest-pick]').getAttribute('aria-pressed'),'true');assert.equal(w.document.activeElement.dataset.interestPick,'animoca-brands');assert.match(q('#interest-summary').textContent,/1 community pick/);
   fail=true;q('[data-interest-pick]').click();await flush();assert.equal(q('[data-interest-pick]').getAttribute('aria-pressed'),'true');assert.match(q('#interest-status').textContent,/Connection lost/);assert.equal(q('[data-interest-pick]').disabled,false);
   fail=false;q('[data-interest-pick]').click();await flush();assert.equal(q('[data-interest-pick]').getAttribute('aria-pressed'),'false');assert.match(q('#interest-summary').textContent,/No picks yet/);assert.deepEqual(sends.at(-1),{companyId:null,expectedVersion:1});
   q('#interest-search').value='no such company';q('#interest-search').dispatchEvent(new w.Event('input'));assert.match(q('#interest-list').textContent,/No matching companies/);
- }finally{w.close();}
+ }finally{await new Promise(resolve=>setTimeout(resolve,0));w.close();}
 });

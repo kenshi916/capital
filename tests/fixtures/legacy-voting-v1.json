@@ -1,0 +1,172 @@
+{
+  "companies": [
+    {
+      "id": "alpha",
+      "name": "Alpha",
+      "image": "/alpha.svg",
+      "platform": "Republic",
+      "security": "Shares",
+      "source": "https://example.com/alpha"
+    },
+    {
+      "id": "beta",
+      "name": "Beta",
+      "image": "/beta.svg",
+      "platform": "Wefunder",
+      "security": "SAFE",
+      "source": "https://example.com/beta"
+    }
+  ],
+  "input": {
+    "title": "Earlier round",
+    "notes": "Original terms",
+    "target": "1000",
+    "chainId": 46630,
+    "token": "0x1111111111111111111111111111111111111111",
+    "rule": "token-weighted",
+    "minimum": "1",
+    "opensAt": 1700000000,
+    "closesAt": 1700003600,
+    "candidates": [
+      {
+        "id": "alpha",
+        "terms": "Original reviewed terms",
+        "documents": "https://example.com/docs",
+        "status": "open",
+        "checkedAt": 1700000000,
+        "reviewed": true
+      },
+      {
+        "id": "beta",
+        "terms": "Original reviewed terms",
+        "documents": "https://example.com/docs",
+        "status": "open",
+        "checkedAt": 1700000000,
+        "reviewed": true
+      }
+    ]
+  },
+  "normalized": {
+    "title": "Earlier round",
+    "notes": "Original terms",
+    "target": "1000",
+    "chainId": 46630,
+    "token": "0x1111111111111111111111111111111111111111",
+    "rule": "token-weighted",
+    "minimum": "1",
+    "opensAt": 1700000000,
+    "closesAt": 1700003600,
+    "candidates": [
+      {
+        "id": "alpha",
+        "name": "Alpha",
+        "image": "/alpha.svg",
+        "platform": "Republic",
+        "security": "Shares",
+        "terms": "Original reviewed terms",
+        "source": "https://example.com/alpha",
+        "documents": "https://example.com/docs",
+        "status": "open",
+        "checkedAt": 1700000000,
+        "reviewed": true
+      },
+      {
+        "id": "beta",
+        "name": "Beta",
+        "image": "/beta.svg",
+        "platform": "Wefunder",
+        "security": "SAFE",
+        "terms": "Original reviewed terms",
+        "source": "https://example.com/beta",
+        "documents": "https://example.com/docs",
+        "status": "open",
+        "checkedAt": 1700000000,
+        "reviewed": true
+      }
+    ]
+  },
+  "proposalHash": "0x54a558350e46b48bd3211ca054450fbd91ddd7e8371fd2675fc7b3436d80c3f6",
+  "round": {
+    "id": "round-original",
+    "revision": 1,
+    "proposal_hash": "0x54a558350e46b48bd3211ca054450fbd91ddd7e8371fd2675fc7b3436d80c3f6",
+    "snapshot_number": 123,
+    "snapshot_hash": "0xabababababababababababababababababababababababababababababababab"
+  },
+  "typedData": {
+    "domain": {
+      "name": "Capital community voting",
+      "version": "1",
+      "chainId": 46630,
+      "salt": "0x81e692cd22268fe52e5e1d01aeaeb9de33cfc0bb9856588297107a09b23c0b12"
+    },
+    "types": {
+      "Ballot": [
+        {
+          "name": "roundTitle",
+          "type": "string"
+        },
+        {
+          "name": "business",
+          "type": "string"
+        },
+        {
+          "name": "wallet",
+          "type": "address"
+        },
+        {
+          "name": "roundId",
+          "type": "string"
+        },
+        {
+          "name": "revision",
+          "type": "uint256"
+        },
+        {
+          "name": "proposalHash",
+          "type": "bytes32"
+        },
+        {
+          "name": "snapshotBlock",
+          "type": "uint256"
+        },
+        {
+          "name": "snapshotHash",
+          "type": "bytes32"
+        },
+        {
+          "name": "choice",
+          "type": "string"
+        },
+        {
+          "name": "sequence",
+          "type": "uint256"
+        },
+        {
+          "name": "nonce",
+          "type": "string"
+        },
+        {
+          "name": "expiresAt",
+          "type": "uint256"
+        }
+      ]
+    },
+    "primaryType": "Ballot",
+    "message": {
+      "roundTitle": "Earlier round",
+      "business": "Alpha",
+      "wallet": "0x1111111111111111111111111111111111111111",
+      "roundId": "round-original",
+      "revision": 1,
+      "proposalHash": "0x54a558350e46b48bd3211ca054450fbd91ddd7e8371fd2675fc7b3436d80c3f6",
+      "snapshotBlock": 123,
+      "snapshotHash": "0xabababababababababababababababababababababababababababababababab",
+      "choice": "alpha",
+      "sequence": 1,
+      "nonce": "original-nonce",
+      "expiresAt": 1700000100
+    }
+  },
+  "typedDataHash": "0x38a7c99f3b6e94b6216119b5ad467e96e053dd4b5e064b30101f3a4303d8d192"
+}
